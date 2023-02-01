@@ -37,11 +37,13 @@ func main() {
 	//}
 	//bod, _ := io.ReadAll(res.Body)
 	//fmt.Println(string(bod))
-	fmt.Println(GetGallList("onii", gjson.Get(GetAppID(), "app_id").String()))
 
+	//fmt.Printf(GetGallList("onii", gjson.Get(GetAppID(), "app_id").String()))
+	str := GetGallList("weatherbaby", gjson.Get(GetAppID(), "app_id").String())
+	fmt.Println(string(str))
 }
 
-func GetGallList(gallid string, appid string) string {
+func GetGallList(gallid string, appid string) []byte {
 	req, err := http.NewRequest("GET", HashedURLmake(gallid, appid), nil)
 	if err != nil {
 		log.Fatal(err)
@@ -55,7 +57,7 @@ func GetGallList(gallid string, appid string) string {
 		log.Fatal(err)
 	}
 	bod, _ := io.ReadAll(res.Body)
-	return string(bod)
+	return bod
 }
 
 func HashedURLmake(gallid string, appid string) string {

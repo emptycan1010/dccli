@@ -2,8 +2,10 @@ package main
 
 import (
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/tidwall/gjson"
 	"io"
 	"log"
 	"net/http"
@@ -19,7 +21,51 @@ type AppCheckstruct struct {
 }
 
 func main() {
-	fmt.Println(GetAppID())
+	//fmt.Println(HashedURLmake("weatherbaby", gjson.Get(GetAppID(), "app_id").String()))
+	//http.Get(HashedURLmake("weatherbaby", gjson.Get(GetAppID(), "app_id").String()))
+	//req, err := http.NewRequest("GET", HashedURLmake("weatherbaby", gjson.Get(GetAppID(), "app_id").String()), nil)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//req.Header.Set("User-Agent", "dcinside.app")
+	//req.Host = "app.dcinside.com"
+	//req.Header.Set("referer", "https://app.dcinside.com")
+	//client := &http.Client{}
+	//res, err := client.Do(req)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//bod, _ := io.ReadAll(res.Body)
+	//fmt.Println(string(bod))
+	fmt.Println(GetGallList("onii", gjson.Get(GetAppID(), "app_id").String()))
+
+}
+
+func GetGallList(gallid string, appid string) string {
+	req, err := http.NewRequest("GET", HashedURLmake(gallid, appid), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Set("User-Agent", "dcinside.app")
+	req.Host = "app.dcinside.com"
+	req.Header.Set("referer", "https://app.dcinside.com")
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	bod, _ := io.ReadAll(res.Body)
+	return string(bod)
+}
+
+func HashedURLmake(gallid string, appid string) string {
+	input := []byte(
+		fmt.Sprintf("https://app.dcinside.com/api/gall_list_new.php?id=%s&page=1&app_id=%s",
+			gallid,
+			appid,
+		),
+	)
+	return fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString(input))
 }
 
 func GetAppID() string {
@@ -51,6 +97,5 @@ func GetAppID() string {
 		log.Fatal(err)
 	}
 	bod, _ = io.ReadAll(res.Body)
-	//fmt.Println(string(bod))
 	return string(bod)
 }

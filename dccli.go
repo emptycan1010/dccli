@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 type AppCheckstruct struct {
@@ -137,17 +138,7 @@ func GetAppID() string {
 }
 
 func AddComment(gallid string, appid string, gno int, datgeul string, writer string, pw string) bool {
-	//res, err := http.PostForm("https://app.dcinside.com/api/comment_ok.php", url.Values{
-	//	"id":           {gallid},
-	//	"no":           {string(gno)},
-	//	"comment_nick": {writer},
-	//	"comment_pw":   {pw},
-	//	"client_token": {"hangus"},
-	//	"app_id":       {appid},
-	//	"mode":         {"com_write"},
-	//	"best_comno":   {"0"},
-	//	"comment_memo": {datgeul},
-	//})
+
 	req, err := http.NewRequest("POST", "https://app.dcinside.com/api/comment_ok.php", nil)
 	if err != nil {
 		log.Fatal(err)
@@ -155,17 +146,34 @@ func AddComment(gallid string, appid string, gno int, datgeul string, writer str
 	req.Header.Set("User-Agent", "dcinside.app")
 	req.Host = "app.dcinside.com"
 	req.Header.Set("referer", "http://app.dcinside.com")
-	q := req.URL.Query()
-	q.Add("id", gallid)
-	q.Add("no", string(gno))
-	q.Add("comment_nick", writer)
-	q.Add("comment_pw", pw)
-	q.Add("client_token", "hangus")
-	q.Add("app_id", appid)
-	q.Add("mode", "com_write")
-	q.Add("best_comno", "0")
-	q.Add("comment_memo", datgeul)
-	req.URL.RawQuery = q.Encode()
+
+	//q := req.URL.Query()
+	//q.Add("id", gallid)
+	//q.Add("no", strconv.Itoa(gno))
+	//q.Add("comment_nick", writer)
+	//q.Add("board_id", "emptycan1010")
+	//q.Add("best_chk", "N")
+	//q.Add("best_comno", "0")
+	//q.Add("comment_pw", pw)
+	//q.Add("client_token", "hangus")
+	//q.Add("app_id", appid)
+	//q.Add("mode", "com_write")
+	//q.Add("comment_memo", datgeul)
+	//req.URL.RawQuery = q.Encode()
+
+	req.PostForm = url.Values{
+		"id":           {gallid},
+		"no":           {strconv.Itoa(gno)},
+		"comment_nick": {writer},
+		"board_id":     {"emptycan1010"},
+		"best_chk":     {"N"},
+		"best_comno":   {"0"},
+		"comment_pw":   {pw},
+		"client_token": {"hangus"},
+		"app_id":       {appid},
+		"mode":         {"com_write"},
+		"comment_memo": {datgeul},
+	}
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {

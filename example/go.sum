@@ -2,6 +2,8 @@ github.com/emptycan1010/dccli v0.0.0-20230202035141-506d0d3e1ddc h1:zq7VbosCMccr
 github.com/emptycan1010/dccli v0.0.0-20230202035141-506d0d3e1ddc/go.mod h1:YJ0tHrkS4aMxRPqwcFXs5l8bf0gJ6eeHF39wgW0AhD0=
 github.com/emptycan1010/dccli v0.0.0-20230202042614-3a22be12fc3b h1:YH002793grBREwbktv8hwYsOeGtFDOOUo/1QO72QBNI=
 github.com/emptycan1010/dccli v0.0.0-20230202042614-3a22be12fc3b/go.mod h1:YJ0tHrkS4aMxRPqwcFXs5l8bf0gJ6eeHF39wgW0AhD0=
+github.com/emptycan1010/dccli v0.0.0-20230202043216-aeae64b63161 h1:aSahY3GcZw2gV6vBdfeDtNGoTKu17ZwbHRFJnKCnO0M=
+github.com/emptycan1010/dccli v0.0.0-20230202043216-aeae64b63161/go.mod h1:YJ0tHrkS4aMxRPqwcFXs5l8bf0gJ6eeHF39wgW0AhD0=
 github.com/tidwall/gjson v1.14.4 h1:uo0p8EbA09J7RQaflQ1aBRffTR7xedD2bcIVSYxLnkM=
 github.com/tidwall/gjson v1.14.4/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/match v1.1.1 h1:+Ho715JplO36QYgwN9PGYNhgZvoUSc9X2c80KVTi+GA=

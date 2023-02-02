@@ -12,5 +12,5 @@ func main() {
 	for i := 0; i < len(r.GallList); i++ {
 		fmt.Println(r.GallList[i].Subject)
 	}
-	dccli.AddComment("tsmanga", appid, "aaa", "ㅇㅇ", "0000")
+	print(dccli.AddComment("tsmanga", appid, 1, "aaa", "ㅇㅇ", "0000"))
 }

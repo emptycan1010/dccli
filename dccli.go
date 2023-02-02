@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/tidwall/gjson"
 	"io"
 	"log"
 	"net/http"
@@ -118,8 +119,6 @@ func GetAppID() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//fmt.Println(Appc[0].Date)
-	//fmt.Sprintf("dcArdchk_%s", Appc[0].Date)
 	h := sha256.New()
 	h.Write([]byte(fmt.Sprintf("dcArdchk_%s", Appc[0].Date))) // value token calculated
 	res, err = http.PostForm(
@@ -135,4 +134,23 @@ func GetAppID() string {
 	}
 	bod, _ = io.ReadAll(res.Body)
 	return string(bod)
+}
+
+func AddComment(gallid string, appid string, datgeul string, writer string, pw string) bool {
+	res, err := http.PostForm("https://app.dcinside.com/api/comment_ok.php", url.Values{
+		"id":           {gallid},
+		"no":           {"1"},
+		"comment_nick": {writer},
+		"comment_pw":   {pw},
+		"client_token": {"hangus"},
+		"app_id":       {appid},
+		"mode":         {"com_write"},
+		"best_comno":   {"0"},
+		"comment_memo": {datgeul},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	bod, _ := io.ReadAll(res.Body)
+	return gjson.Get(string(bod), "0.result").Bool()
 }

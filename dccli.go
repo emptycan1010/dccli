@@ -136,18 +136,38 @@ func GetAppID() string {
 	return string(bod)
 }
 
-func AddComment(gallid string, appid string, datgeul string, writer string, pw string) bool {
-	res, err := http.PostForm("https://app.dcinside.com/api/comment_ok.php", url.Values{
-		"id":           {gallid},
-		"no":           {"1"},
-		"comment_nick": {writer},
-		"comment_pw":   {pw},
-		"client_token": {"hangus"},
-		"app_id":       {appid},
-		"mode":         {"com_write"},
-		"best_comno":   {"0"},
-		"comment_memo": {datgeul},
-	})
+func AddComment(gallid string, appid string, gno int, datgeul string, writer string, pw string) bool {
+	//res, err := http.PostForm("https://app.dcinside.com/api/comment_ok.php", url.Values{
+	//	"id":           {gallid},
+	//	"no":           {string(gno)},
+	//	"comment_nick": {writer},
+	//	"comment_pw":   {pw},
+	//	"client_token": {"hangus"},
+	//	"app_id":       {appid},
+	//	"mode":         {"com_write"},
+	//	"best_comno":   {"0"},
+	//	"comment_memo": {datgeul},
+	//})
+	req, err := http.NewRequest("POST", "https://app.dcinside.com/api/comment_ok.php", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Set("User-Agent", "dcinside.app")
+	req.Host = "app.dcinside.com"
+	req.Header.Set("referer", "http://app.dcinside.com")
+	q := req.URL.Query()
+	q.Add("id", gallid)
+	q.Add("no", string(gno))
+	q.Add("comment_nick", writer)
+	q.Add("comment_pw", pw)
+	q.Add("client_token", "hangus")
+	q.Add("app_id", appid)
+	q.Add("mode", "com_write")
+	q.Add("best_comno", "0")
+	q.Add("comment_memo", datgeul)
+	req.URL.RawQuery = q.Encode()
+	client := &http.Client{}
+	res, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,4 +1,4 @@
-module dcapi
+module github.com/emptycan1010/dccli
 
 go 1.19
 

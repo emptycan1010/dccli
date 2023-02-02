@@ -1,4 +1,4 @@
-module github.com/emptycan1010/dccli
+module github.com/emptycan1010/dcgo
 
 go 1.19
 

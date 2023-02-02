@@ -138,40 +138,6 @@ func GetAppID() string {
 	return string(bod)
 }
 
-//func AddComment(gallid string, appid string, gno int, datgeul string, writer string, pw string) bool {
-//
-//	req, err := http.NewRequest("POST", "https://app.dcinside.com/api/comment_ok.php", nil)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	req.Header.Set("User-Agent", "dcinside.app")
-//	req.Host = "app.dcinside.com"
-//	req.Header.Set("referer", "http://app.dcinside.com")
-//	r := multipart.NewWriter(nil)
-//	r.WriteField()
-//	req.Header.Set("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW")
-//	req.PostForm = url.Values{
-//		"id":           {gallid},
-//		"no":           {strconv.Itoa(gno)},
-//		"comment_nick": {writer},
-//		"board_id":     {"emptycan1010"},
-//		"best_chk":     {"N"},
-//		"best_comno":   {"0"},
-//		"comment_pw":   {pw},
-//		"client_token": {"hangus"},
-//		"app_id":       {appid},
-//		"mode":         {"com_write"},
-//		"comment_memo": {datgeul},
-//	}
-//	client := &http.Client{}
-//	res, err := client.Do(req)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	bod, _ := io.ReadAll(res.Body)
-//	return gjson.Get(string(bod), "0.result").Bool()
-//}
-
 func AddComment(gallid string, appid string, gno int, datgeul string, writer string, pw string) bool {
 	rr := url.Values{}
 	rr.Add("id", gallid)

@@ -8,7 +8,6 @@ import (
 
 func main() {
 	r := dccli.GetGallList("weatherbaby", gjson.Get(dccli.GetAppID(), "app_id").String())
-
 	for i := 0; i < len(r.GallList); i++ {
 		fmt.Println(r.GallList[i].Subject)
 	}

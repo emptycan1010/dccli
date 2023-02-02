@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 type AppCheckstruct struct {
@@ -126,7 +127,7 @@ func GetAppID() string {
 		"https://msign.dcinside.com/auth/mobile_app_verification",
 		url.Values{
 			"value_token":  {fmt.Sprintf("%x", h.Sum(nil))},
-			"signature":    {"5rJxRKJ2YLHgBgj6RdMZBl2X0KcftUuMoXVug0bsKd0="},
+			"signature":    {"ReOo4u96nnv8Njd7707KpYiIVYQ3FlcKHDJE046Pg6s="},
 			"client_token": {"hangus"},
 		},
 	)
@@ -137,48 +138,70 @@ func GetAppID() string {
 	return string(bod)
 }
 
-func AddComment(gallid string, appid string, gno int, datgeul string, writer string, pw string) bool {
+//func AddComment(gallid string, appid string, gno int, datgeul string, writer string, pw string) bool {
+//
+//	req, err := http.NewRequest("POST", "https://app.dcinside.com/api/comment_ok.php", nil)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	req.Header.Set("User-Agent", "dcinside.app")
+//	req.Host = "app.dcinside.com"
+//	req.Header.Set("referer", "http://app.dcinside.com")
+//	r := multipart.NewWriter(nil)
+//	r.WriteField()
+//	req.Header.Set("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW")
+//	req.PostForm = url.Values{
+//		"id":           {gallid},
+//		"no":           {strconv.Itoa(gno)},
+//		"comment_nick": {writer},
+//		"board_id":     {"emptycan1010"},
+//		"best_chk":     {"N"},
+//		"best_comno":   {"0"},
+//		"comment_pw":   {pw},
+//		"client_token": {"hangus"},
+//		"app_id":       {appid},
+//		"mode":         {"com_write"},
+//		"comment_memo": {datgeul},
+//	}
+//	client := &http.Client{}
+//	res, err := client.Do(req)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	bod, _ := io.ReadAll(res.Body)
+//	return gjson.Get(string(bod), "0.result").Bool()
+//}
 
-	req, err := http.NewRequest("POST", "https://app.dcinside.com/api/comment_ok.php", nil)
+func AddComment(gallid string, appid string, gno int, datgeul string, writer string, pw string) bool {
+	rr := url.Values{}
+	rr.Add("id", gallid)
+	rr.Add("no", strconv.Itoa(gno))
+	rr.Add("comment_nick", writer)
+	rr.Add("comment_pw", pw)
+	rr.Add("client_token", "eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx")
+	rr.Add("app_id", appid)
+	rr.Add("mode", "com_write")
+	rr.Add("comment_memo", datgeul)
+	req, err := http.NewRequest(
+		"POST",
+		"https://app.dcinside.com/api/comment_ok.php",
+		strings.NewReader(rr.Encode()),
+	)
+	fmt.Println(rr.Encode())
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Set("User-Agent", "dcinside.app")
-	req.Host = "app.dcinside.com"
-	req.Header.Set("referer", "http://app.dcinside.com")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("user-agent", "dcinside.app")
+	req.Header.Set("Host", "app.dcinside.com")
 
-	//q := req.URL.Query()
-	//q.Add("id", gallid)
-	//q.Add("no", strconv.Itoa(gno))
-	//q.Add("comment_nick", writer)
-	//q.Add("board_id", "emptycan1010")
-	//q.Add("best_chk", "N")
-	//q.Add("best_comno", "0")
-	//q.Add("comment_pw", pw)
-	//q.Add("client_token", "hangus")
-	//q.Add("app_id", appid)
-	//q.Add("mode", "com_write")
-	//q.Add("comment_memo", datgeul)
-	//req.URL.RawQuery = q.Encode()
-
-	req.PostForm = url.Values{
-		"id":           {gallid},
-		"no":           {strconv.Itoa(gno)},
-		"comment_nick": {writer},
-		"board_id":     {"emptycan1010"},
-		"best_chk":     {"N"},
-		"best_comno":   {"0"},
-		"comment_pw":   {pw},
-		"client_token": {"hangus"},
-		"app_id":       {appid},
-		"mode":         {"com_write"},
-		"comment_memo": {datgeul},
-	}
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
 	bod, _ := io.ReadAll(res.Body)
+	fmt.Println(string(bod))
 	return gjson.Get(string(bod), "0.result").Bool()
 }

@@ -1,11 +1,10 @@
-package main
+package dcapi
 
 import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/tidwall/gjson"
 	"io"
 	"log"
 	"net/http"
@@ -66,32 +65,15 @@ type HeadTXT struct {
 	Selected bool   `json:"selected"`
 }
 
-func main() {
-	//fmt.Println(HashedURLmake("weatherbaby", gjson.Get(GetAppID(), "app_id").String()))
-	//http.Get(HashedURLmake("weatherbaby", gjson.Get(GetAppID(), "app_id").String()))
-	//req, err := http.NewRequest("GET", HashedURLmake("weatherbaby", gjson.Get(GetAppID(), "app_id").String()), nil)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//req.Header.Set("User-Agent", "dcinside.app")
-	//req.Host = "app.dcinside.com"
-	//req.Header.Set("referer", "https://app.dcinside.com")
-	//client := &http.Client{}
-	//res, err := client.Do(req)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//bod, _ := io.ReadAll(res.Body)
-	//fmt.Println(string(bod))
+//func main() {
+//	r := GetGallList("weatherbaby", gjson.Get(GetAppID(), "app_id").String())
+//
+//	for i := 0; i < len(r.GallList); i++ {
+//		fmt.Println(r.GallList[i].Subject)
+//	}
+//}
 
-	//fmt.Printf(GetGallList("onii", gjson.Get(GetAppID(), "app_id").String()))
-	r := GetGallList("weatherbaby", gjson.Get(GetAppID(), "app_id").String())
-	for _, v := range r {
-		fmt.Println(v.GallList)
-	}
-}
-
-func GetGallList(gallid string, appid string) []Getgalldata {
+func GetGallList(gallid string, appid string) Getgalldata {
 	req, err := http.NewRequest("GET", HashedURLmake(gallid, appid), nil)
 	if err != nil {
 		log.Fatal(err)
@@ -110,7 +92,7 @@ func GetGallList(gallid string, appid string) []Getgalldata {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return gg
+	return gg[0]
 }
 
 func HashedURLmake(gallid string, appid string) string {

@@ -1,4 +1,4 @@
-module main
+module dcapi
 
 go 1.19
 

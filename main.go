@@ -1,4 +1,4 @@
-package dcapi
+package dccli
 
 import (
 	"crypto/sha256"

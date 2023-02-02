@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/tidwall/gjson"
 	"io"
@@ -76,7 +77,7 @@ type HeadTXT struct {
 //	}
 //}
 
-func GetGallList(gallid string, appid string) Getgalldata {
+func GetGallList(gallid string, appid string) (Getgalldata, error) {
 	req, err := http.NewRequest("GET", HashedURLmake(gallid, appid), nil)
 	if err != nil {
 		log.Fatal(err)
@@ -87,15 +88,15 @@ func GetGallList(gallid string, appid string) Getgalldata {
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return Getgalldata{}, errors.New("Error Posting Request")
 	}
 	bod, _ := io.ReadAll(res.Body)
 	var gg []Getgalldata
 	err = json.Unmarshal(bod, &gg)
 	if err != nil {
-		log.Fatal(err)
+		return Getgalldata{}, errors.New("Error Unmarshaling Json")
 	}
-	return gg[0]
+	return gg[0], nil
 }
 
 func HashedURLmake(gallid string, appid string) string {
@@ -108,7 +109,7 @@ func HashedURLmake(gallid string, appid string) string {
 	return fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString(input))
 }
 
-func GetAppID() string {
+func GetAppID() (string, error) {
 	res, err := http.Get("http://json2.dcinside.com/json0/app_check_A_rina.php")
 	if err != nil {
 		log.Fatal(err)
@@ -132,13 +133,13 @@ func GetAppID() string {
 		},
 	)
 	if err != nil {
-		log.Fatal(err)
+		return "", errors.New("Error GetAppID function")
 	}
 	bod, _ = io.ReadAll(res.Body)
-	return string(bod)
+	return string(bod), nil
 }
 
-func AddComment(gallid string, appid string, gno int, datgeul string, writer string, pw string) bool {
+func AddComment(gallid string, appid string, gno int, datgeul string, writer string, pw string) (bool, error) {
 	rr := url.Values{}
 	rr.Add("id", gallid)
 	rr.Add("no", strconv.Itoa(gno))
@@ -156,7 +157,7 @@ func AddComment(gallid string, appid string, gno int, datgeul string, writer str
 	fmt.Println(rr.Encode())
 
 	if err != nil {
-		log.Fatal(err)
+		return false, errors.New("Error Posting Request")
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("user-agent", "dcinside.app")
@@ -165,9 +166,9 @@ func AddComment(gallid string, appid string, gno int, datgeul string, writer str
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return false, errors.New("Error Posting Request")
 	}
 	bod, _ := io.ReadAll(res.Body)
 	fmt.Println(string(bod))
-	return gjson.Get(string(bod), "0.result").Bool()
+	return gjson.Get(string(bod), "0.result").Bool(), nil
 }

@@ -20,6 +20,52 @@ type AppCheckstruct struct {
 	Date          string `json:"date"`
 }
 
+type Getgalldata struct {
+	GallList []GallList `json:"gall_list"`
+	GallInfo []GallInfo `json:"gall_info"`
+}
+
+type GallList struct {
+	No             string `json:"no"`
+	Hit            string `json:"hit"`
+	Recommend      string `json:"recommend"`
+	Img_icon       string `json:"img_icon"`
+	Movie_icon     string `json:"movie_icon"`
+	Recommend_icon string `json:"recommend_icon"`
+	Best_chk       string `json:"best_chk"`
+	Realtime_chk   string `json:"realtime_chk"`
+	Realtime_l_chk string `json:"realtime_l_chk"`
+	Level          string `json:"level"`
+	Total_comment  string `json:"total_comment"`
+	Total_voice    string `json:"total_voice"`
+	User_id        string `json:"user_id"`
+	Voice_icon     string `json:"voice_icon"`
+	Winnerta_icon  string `json:"winnerta_icon"`
+	Member_icon    string `json:"member_icon"`
+	Ip             string `json:"ip"`
+	Subject        string `json:"subject"`
+	Name           string `json:"name"`
+	Date_time      string `json:"date_time"`
+	Headtext       string `json:"headtext"`
+}
+
+type GallInfo struct {
+	Gall_title    string    `json:"gall_title"`
+	Category      string    `json:"category"`
+	File_cnt      string    `json:"file_cnt"`
+	File_size     string    `json:"file_size"`
+	Is_minor      bool      `json:"is_minor"`
+	Head_text     []HeadTXT `json:"head_text"`
+	notify_recent string    `json:"notify_recent"`
+}
+
+type HeadTXT struct {
+	No       string `json:"no"`
+	Name     string `json:"name"`
+	Level    string `json:"level"`
+	Selected bool   `json:"selected"`
+}
+
 func main() {
 	//fmt.Println(HashedURLmake("weatherbaby", gjson.Get(GetAppID(), "app_id").String()))
 	//http.Get(HashedURLmake("weatherbaby", gjson.Get(GetAppID(), "app_id").String()))
@@ -39,11 +85,13 @@ func main() {
 	//fmt.Println(string(bod))
 
 	//fmt.Printf(GetGallList("onii", gjson.Get(GetAppID(), "app_id").String()))
-	str := GetGallList("weatherbaby", gjson.Get(GetAppID(), "app_id").String())
-	fmt.Println(string(str))
+	r := GetGallList("weatherbaby", gjson.Get(GetAppID(), "app_id").String())
+	for _, v := range r {
+		fmt.Println(v.GallList)
+	}
 }
 
-func GetGallList(gallid string, appid string) []byte {
+func GetGallList(gallid string, appid string) []Getgalldata {
 	req, err := http.NewRequest("GET", HashedURLmake(gallid, appid), nil)
 	if err != nil {
 		log.Fatal(err)
@@ -57,7 +105,12 @@ func GetGallList(gallid string, appid string) []byte {
 		log.Fatal(err)
 	}
 	bod, _ := io.ReadAll(res.Body)
-	return bod
+	var gg []Getgalldata
+	err = json.Unmarshal(bod, &gg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return gg
 }
 
 func HashedURLmake(gallid string, appid string) string {

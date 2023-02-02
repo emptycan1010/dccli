@@ -154,7 +154,7 @@ func AddComment(gallid string, appid string, gno int, datgeul string, writer str
 		"https://app.dcinside.com/api/comment_ok.php",
 		strings.NewReader(rr.Encode()),
 	)
-	fmt.Println(rr.Encode())
+	//fmt.Println(rr.Encode())
 
 	if err != nil {
 		return false, errors.New("Error Posting Request")
@@ -169,6 +169,5 @@ func AddComment(gallid string, appid string, gno int, datgeul string, writer str
 		return false, errors.New("Error Posting Request")
 	}
 	bod, _ := io.ReadAll(res.Body)
-	fmt.Println(string(bod))
 	return gjson.Get(string(bod), "0.result").Bool(), nil
 }

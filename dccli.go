@@ -177,8 +177,8 @@ func AddComment(gallid string, appid string, gno int, datgeul string, writer str
 }
 
 func GetComment(gallid string, appid string, gno int, commentpage int) (Comment, error) {
-	url := Base64EncodeLink(fmt.Sprintf("https://app.dcinside.com/api/comment_new.php?id=%s&no=%d&app_id=%s&re_page=%d", gallid, gno, appid, commentpage))
-	req, err := http.NewRequest("GET", url, nil)
+	urld := Base64EncodeLink(fmt.Sprintf("https://app.dcinside.com/api/comment_new.php?id=%s&no=%d&app_id=%s&re_page=%d", gallid, gno, appid, commentpage))
+	req, err := http.NewRequest("GET", urld, nil)
 	if err != nil {
 		return Comment{}, errors.New("Error Posting Request")
 	}
@@ -256,17 +256,17 @@ type PostViewInfo struct {
 }
 
 type PostViewMain struct {
-	memo             string `json:"memo"`
-	recommend        string `json:"recommend"`
-	recommend_member string `json:"recommend_member"`
-	nonrecommend     string `json:"nonrecommend"`
-	nonrecomm_user   bool   `json:"nonrecomm_user"`
+	Memo             string `json:"memo"`
+	Recommend        string `json:"recommend"`
+	Recommend_member string `json:"recommend_member"`
+	Nonrecommend     string `json:"nonrecommend"`
+	Nonrecomm_user   bool   `json:"nonrecomm_user"`
 }
 
 func GetPost(gallid string, appid string, gno int) (Post, error) {
 	// url is https://app.dcinside.com/api/gall_view_new.php?id=tsmanga&no=1&app_id=T0RtOWkzbFRhVEJndnExU3hmMC80QTV1WVgzQ21SNHdxRS9jRjRocDJUVT0%3D&client_id=eGTqnqzsSzSKYCSWs7LJ8j%3AAPA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx7
-	url := Base64EncodeLink(fmt.Sprintf("https://app.dcinside.com/api/gall_view_new.php?id=%s&no=%d&app_id=%s&client_id=eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx", gallid, gno, appid))
-	req, err := http.NewRequest("GET", url, nil)
+	urld := Base64EncodeLink(fmt.Sprintf("https://app.dcinside.com/api/gall_view_new.php?id=%s&no=%d&app_id=%s&client_id=eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx", gallid, gno, appid))
+	req, err := http.NewRequest("GET", urld, nil)
 	if err != nil {
 		return Post{}, errors.New("Error Making Request")
 	}

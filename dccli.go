@@ -109,7 +109,7 @@ func HashedURLmake(gallid string, appid string) string {
 	return fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString(input))
 }
 
-func Base64HashLink(input string) string {
+func Base64EncodeLink(input string) string {
 	return fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString([]byte(input)))
 }
 
@@ -177,7 +177,7 @@ func AddComment(gallid string, appid string, gno int, datgeul string, writer str
 }
 
 func GetComment(gallid string, appid string, gno int, commentpage int) (Comment, error) {
-	url := Base64HashLink(fmt.Sprintf("https://app.dcinside.com/api/comment_new.php?id=%s&no=%d&app_id=%s&re_page=%d", gallid, gno, appid, commentpage))
+	url := Base64EncodeLink(fmt.Sprintf("https://app.dcinside.com/api/comment_new.php?id=%s&no=%d&app_id=%s&re_page=%d", gallid, gno, appid, commentpage))
 	// Let's hash url into base64
 	// fmt.Println(url)
 	req, err := http.NewRequest("GET", url, nil)

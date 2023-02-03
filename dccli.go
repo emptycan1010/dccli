@@ -133,6 +133,21 @@ type PostViewMain struct {
 	Nonrecomm_user   bool   `json:"nonrecomm_user"`
 }
 
+type Account struct {
+	Result           bool   `json:"result"`
+	User_id          string `json:"user_id"`
+	User_no          string `json:"user_no"`
+	Name             string `json:"name"`
+	Is_adult         string `json:"is_adult"`
+	Is_dormancy      int    `json:"is_dormancy"`
+	Otp_token        string `json:"otp_token"`
+	Is_gonick        int    `json:"is_gonick"`
+	Is_security_code string `json:"is_security_code"`
+	Auth_change      int    `json:"auth_change"`
+	Stype            string `json:"stype"`
+	Pw_campaign      int    `json:"pw_campaign"`
+}
+
 func GetGallList(gallid string, appid string) (Getgalldata, error) {
 	req, err := http.NewRequest("GET", HashedURLmake(gallid, appid), nil)
 	if err != nil {
@@ -342,19 +357,4 @@ func Login(id string, pw string) (Account, error) {
 	json.Unmarshal(bod, &account)
 	// fmt.Println(account)
 	return account, nil
-}
-
-type Account struct {
-	Result           bool   `json:"result"`
-	User_id          string `json:"user_id"`
-	User_no          string `json:"user_no"`
-	Name             string `json:"name"`
-	Is_adult         string `json:"is_adult"`
-	Is_dormancy      int    `json:"is_dormancy"`
-	Otp_token        string `json:"otp_token"`
-	Is_gonick        int    `json:"is_gonick"`
-	Is_security_code string `json:"is_security_code"`
-	Auth_change      int    `json:"auth_change"`
-	Stype            string `json:"stype"`
-	Pw_campaign      int    `json:"pw_campaign"`
 }

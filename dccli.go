@@ -309,3 +309,52 @@ func DelPost(gallid string, appid string, gno int, pw string) (bool, error) {
 	bod, _ := io.ReadAll(res.Body)
 	return gjson.Get(string(bod), "result").Bool(), nil
 }
+
+func Login(id string, pw string) (Account, error) {
+	rr := url.Values{}
+	rr.Add("user_id", id)
+	rr.Add("user_pw", pw)
+	rr.Add("client_token", "eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx")
+	rr.Add("mode", "login_normal")
+
+	req, err := http.NewRequest(
+		"POST",
+		"https://msign.dcinside.com/api/login",
+		strings.NewReader(rr.Encode()),
+	)
+	if err != nil {
+		return Account{}, errors.New("Error Making Request")
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("user-agent", "dcinside.app")
+	req.Header.Set("Host", "msign.dcinside.com")
+	req.Header.Set("referer", "http://www.dcinside.com")
+	client := &http.Client{}
+
+	res, err := client.Do(req)
+
+	if err != nil {
+		return Account{}, errors.New("Error Posting Request")
+	}
+	bod, _ := io.ReadAll(res.Body)
+	// fmt.Println(string(bod))
+	var account Account
+	json.Unmarshal(bod, &account)
+	// fmt.Println(account)
+	return account, nil
+}
+
+type Account struct {
+	Result           bool   `json:"result"`
+	User_id          string `json:"user_id"`
+	User_no          string `json:"user_no"`
+	Name             string `json:"name"`
+	Is_adult         string `json:"is_adult"`
+	Is_dormancy      int    `json:"is_dormancy"`
+	Otp_token        string `json:"otp_token"`
+	Is_gonick        int    `json:"is_gonick"`
+	Is_security_code string `json:"is_security_code"`
+	Auth_change      int    `json:"auth_change"`
+	Stype            string `json:"stype"`
+	Pw_campaign      int    `json:"pw_campaign"`
+}

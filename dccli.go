@@ -172,7 +172,7 @@ func AddComment(gallid string, appid string, gno int, datgeul string, writer str
 	return gjson.Get(string(bod), "0.result").Bool(), nil
 }
 
-func GetComment(gallid string, appid string, gno int, commentpage int) ([]Comment, error) {
+func GetComment(gallid string, appid string, gno int, commentpage int) (Comment, error) {
 	url := fmt.Sprintf("https://app.dcinside.com/api/comment_new.php?id=%s&no=%d&app_id=%s&re_page=%d", gallid, gno, appid, commentpage)
 	// Let's hash url into base64
 	// fmt.Println(url)
@@ -180,7 +180,7 @@ func GetComment(gallid string, appid string, gno int, commentpage int) ([]Commen
 	url = fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString(input))
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return []Comment{}, errors.New("Error Posting Request")
+		return Comment{}, errors.New("Error Posting Request")
 	}
 	req.Header.Set("User-Agent", "dcinside.app")
 	req.Host = "app.dcinside.com"
@@ -188,16 +188,16 @@ func GetComment(gallid string, appid string, gno int, commentpage int) ([]Commen
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		return []Comment{}, errors.New("Error Posting Request")
+		return Comment{}, errors.New("Error Posting Request")
 
 	}
 	var commentlist []Comment
 	bod, _ := io.ReadAll(res.Body)
 	err = json.Unmarshal(bod, &commentlist)
 	if err != nil {
-		return []Comment{}, errors.New("Error while parsing json")
+		return Comment{}, errors.New("Error while parsing json")
 	}
-	return commentlist, nil
+	return commentlist[0], nil
 }
 
 type CommentList struct {

@@ -59,7 +59,7 @@ type GallInfo struct {
 	File_size     string    `json:"file_size"`
 	Is_minor      bool      `json:"is_minor"`
 	Head_text     []HeadTXT `json:"head_text"`
-	notify_recent string    `json:"notify_recent"`
+	Notify_recent string    `json:"notify_recent"`
 }
 
 type HeadTXT struct {
@@ -170,4 +170,53 @@ func AddComment(gallid string, appid string, gno int, datgeul string, writer str
 	}
 	bod, _ := io.ReadAll(res.Body)
 	return gjson.Get(string(bod), "0.result").Bool(), nil
+}
+
+func GetComment(gallid string, appid string, gno int, commentpage int) ([]Comment, error) {
+	url := fmt.Sprintf("https://app.dcinside.com/api/comment_new.php?id=%s&no=%d&app_id=%s&re_page=%d", gallid, gno, appid, commentpage)
+	// Let's hash url into base64
+	// fmt.Println(url)
+	input := []byte(url)
+	url = fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString(input))
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return []Comment{}, errors.New("Error Posting Request")
+	}
+	req.Header.Set("User-Agent", "dcinside.app")
+	req.Host = "app.dcinside.com"
+	req.Header.Set("referer", "https://app.dcinside.com")
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return []Comment{}, errors.New("Error Posting Request")
+
+	}
+	var commentlist []Comment
+	bod, _ := io.ReadAll(res.Body)
+	err = json.Unmarshal(bod, &commentlist)
+	if err != nil {
+		return []Comment{}, errors.New("Error while parsing json")
+	}
+	return commentlist, nil
+}
+
+type CommentList struct {
+	Is_delete_flag   string `json:"is_delete_flag"` // 이 댓글은 게시물 작성자가 삭제하였습니다.
+	Member_icon      string `json:"member_icon"`
+	IpData           string `json:"ip_data"`
+	Name             string `json:"name"`
+	User_id          string `json:"user_id"`
+	Comment_memo     string `json:"comment_memo"`
+	Dccon            string `json:"dccon"`
+	Dccon_detail_idx string `json:"dccon_detail_idx"`
+	Comment_no       string `json:"comment_no"`
+	Date_time        string `json:"date_time"`
+	Del_scope        string `json:"del_scope"`
+}
+
+type Comment struct {
+	Total_comment string        `json:"total_comment"`
+	Total_page    string        `json:"total_page"`
+	Re_page       string        `json:"re_page"`
+	Comment_list  []CommentList `json:"comment_list"`
 }

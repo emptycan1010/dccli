@@ -21,9 +21,5 @@ func main() {
 	// 	log.Fatalln(e)
 	// }
 	// fmt.Println(res)
-	res, e := dccli.GetPost("tsmanga", appid, 1)
-	if e != nil {
-		log.Fatalln(e)
-	}
-	fmt.Println(res)
+	fmt.Print(dccli.DelPost("tsmanga", appid, 9, "1111"))
 }

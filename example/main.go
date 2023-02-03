@@ -14,9 +14,14 @@ func main() {
 		log.Fatalln(e)
 	}
 	appid := gjson.Get(r, "app_id").String()
-	fmt.Println(appid)
+	// fmt.Println(appid)
 	// print(dccli.AddComment("tsmanga", appid, 1, "aaa", "ㅇㅇ", "1111"))
-	res, e := dccli.GetComment("tsmanga", appid, 1, 1)
+	// res, e := dccli.GetComment("tsmanga", appid, 1, 1)
+	// if e != nil {
+	// 	log.Fatalln(e)
+	// }
+	// fmt.Println(res)
+	res, e := dccli.GetPost("tsmanga", appid, 1)
 	if e != nil {
 		log.Fatalln(e)
 	}

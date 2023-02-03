@@ -109,6 +109,10 @@ func HashedURLmake(gallid string, appid string) string {
 	return fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString(input))
 }
 
+func Base64HashLink(input string) string {
+	return fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString([]byte(input)))
+}
+
 func GetAppID() (string, error) {
 	res, err := http.Get("http://json2.dcinside.com/json0/app_check_A_rina.php")
 	if err != nil {
@@ -173,11 +177,9 @@ func AddComment(gallid string, appid string, gno int, datgeul string, writer str
 }
 
 func GetComment(gallid string, appid string, gno int, commentpage int) (Comment, error) {
-	url := fmt.Sprintf("https://app.dcinside.com/api/comment_new.php?id=%s&no=%d&app_id=%s&re_page=%d", gallid, gno, appid, commentpage)
+	url := Base64HashLink(fmt.Sprintf("https://app.dcinside.com/api/comment_new.php?id=%s&no=%d&app_id=%s&re_page=%d", gallid, gno, appid, commentpage))
 	// Let's hash url into base64
 	// fmt.Println(url)
-	input := []byte(url)
-	url = fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString(input))
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return Comment{}, errors.New("Error Posting Request")
@@ -189,7 +191,6 @@ func GetComment(gallid string, appid string, gno int, commentpage int) (Comment,
 	res, err := client.Do(req)
 	if err != nil {
 		return Comment{}, errors.New("Error Posting Request")
-
 	}
 	var commentlist []Comment
 	bod, _ := io.ReadAll(res.Body)

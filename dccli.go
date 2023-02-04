@@ -358,3 +358,33 @@ func Login(id string, pw string) (Account, error) {
 	// fmt.Println(account)
 	return account, nil
 }
+
+func DelComment(gallid string, appid string, gno int, commentno int, pw string) (bool, error) {
+	rr := url.Values{}
+	rr.Add("id", gallid)
+	rr.Add("no", strconv.Itoa(gno))
+	rr.Add("comment_no", strconv.Itoa(commentno))
+	rr.Add("comment_pw", pw)
+	rr.Add("app_id", appid)
+	rr.Add("mode", "comment_del")
+	rr.Add("client_token", "eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx")
+	req, err := http.NewRequest(
+		"POST",
+		"https://app.dcinside.com/api/comment_del.php",
+		strings.NewReader(rr.Encode()),
+	)
+	if err != nil {
+		return false, errors.New("Error making post Request")
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("user-agent", "dcinside.app")
+	req.Header.Set("Host", "app.dcinside.com")
+	req.Header.Set("referer", "https://app.dcinside.com")
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return false, errors.New("Error Posting Request")
+	}
+	bod, _ := io.ReadAll(res.Body)
+	return gjson.Get(string(bod), "0.result").Bool(), nil
+}

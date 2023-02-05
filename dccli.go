@@ -384,7 +384,10 @@ func (s *Session) Login(id string, pw string) error {
 	bod, _ := io.ReadAll(res.Body)
 	// fmt.Println(string(bod))
 	var account Account
-	json.Unmarshal(bod, &account)
+	e := json.Unmarshal(bod, &account)
+	if e != nil {
+		return errors.New("Error while parsing json")
+	}
 	// fmt.Println(account)
 	if account.Result == true {
 		s.isLoggedin = true

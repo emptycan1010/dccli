@@ -22,11 +22,10 @@ func main() {
 	// r, _ := dccli.Login("adfasdfasdf", "111@")
 	// print(dccli.DelComment("tsmanga", appid, 1, 39, "1111"))
 	d := dccli.New()
-	// d.GetAppID()
-	r, e := d.DelComment("tsmanga", 1, 39, "1111")
-	if e != nil {
-		panic(e)
-	}
-	fmt.Println(r)
-
+	d.NoLogID = "ㅇㅇ"
+	d.NoLogPW = "1111"
+	d.GetAppID()
+	memo := []dccli.MemoBlock{}
+	memo = append(memo, dccli.MemoBlock{Content: "<div>test</div>"})
+	fmt.Println(d.RequestPost("tsmanga", memo, "테스트"))
 }

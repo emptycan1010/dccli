@@ -8,7 +8,7 @@ require (
 )
 
 require (
-	github.com/emptycan1010/dcgo v0.0.0-20230202150232-7fe7892ca4eb // indirect
+	github.com/emptycan1010/dcgo v0.0.0-20230205130849-56ffeec5a8a3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 )

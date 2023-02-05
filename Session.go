@@ -17,6 +17,8 @@ import (
 type Session struct {
 	Account    Account
 	isLoggedin bool
+	NoLogID    string
+	NoLogPW    string
 	Appid      string
 	Apptoken   string
 	NowGallID  string
@@ -61,6 +63,21 @@ func Base64EncodeLink(input string) string {
 }
 
 func (s *Session) GetAppID() error {
+	//{
+	//	"fid": "fT-9GN8ASwOa9ihWpuokdn",
+	//	"appId": "1:477369754343:android:d2ffdd960120a207727842",
+	//	"authVersion": "FIS_v2",
+	//	"sdkVersion": "a:17.0.2"
+	//}
+	//{
+	//	"name": "projects/477369754343/installations/fT-9GN8ASwOa9ihWpuokdn",
+	//	"fid": "fT-9GN8ASwOa9ihWpuokdn",
+	//	"refreshToken": "3_AS3qfwKZ1zsz4C0dvSZdg9CBYSKG4MBEoYrNuKiGg-908_yTBGRkxTD1qeI_vuzCOGb5GSj8O8cxdCwWFXT0fEBlPNEmAkbPV5ZFOVRg-yQKojU",
+	//	"authToken": {
+	//	"token": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjE6NDc3MzY5NzU0MzQzOmFuZHJvaWQ6ZDJmZmRkOTYwMTIwYTIwNzcyNzg0MiIsImV4cCI6MTY3NjIwOTYxOCwiZmlkIjoiZlQtOUdOOEFTd09hOWloV3B1b2tkbiIsInByb2plY3ROdW1iZXIiOjQ3NzM2OTc1NDM0M30.AB2LPV8wRgIhALHo8OYiKb41UxwuCyjPLJ21qQQM2Ofme63jdbQc0YzHAiEAvbRYIf13I0NqMmHBe5iRz7-Hglcx0-RfCf0sOi8XWnw",
+	//		"expiresIn": "604800s"
+	//}
+	//token=fT-9GN8ASwOa9ihWpuokdn:APA91bHW2DbvpDTeJxUA_ACwoLzPkCfJpWqj5N2Eb9H7gYz9D28e1jJH_RRXZoDDMKClZSlXXVosI10BlHGcFgOg1dkkJRm8qCaU9Fci7V2q9ZSRSefw0tA7xW1A_3jl8UU5GG3_uLNL
 	res, err := http.Get("http://json2.dcinside.com/json0/app_check_A_rina.php")
 	if err != nil {
 		log.Fatal(err)
@@ -80,7 +97,7 @@ func (s *Session) GetAppID() error {
 		url.Values{
 			"value_token":  {fmt.Sprintf("%x", h.Sum(nil))},
 			"signature":    {"ReOo4u96nnv8Njd7707KpYiIVYQ3FlcKHDJE046Pg6s="},
-			"client_token": {"hangus"},
+			"client_token": {"fT-9GN8ASwOa9ihWpuokdn:APA91bHW2DbvpDTeJxUA_ACwoLzPkCfJpWqj5N2Eb9H7gYz9D28e1jJH_RRXZoDDMKClZSlXXVosI10BlHGcFgOg1dkkJRm8qCaU9Fci7V2q9ZSRSefw0tA7xW1A_3jl8UU5GG3_uLNL"},
 		},
 	)
 	if err != nil {
@@ -98,7 +115,7 @@ func (s *Session) Login(id string, pw string) error {
 	rr := url.Values{}
 	rr.Add("user_id", id)
 	rr.Add("user_pw", pw)
-	rr.Add("client_token", "eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx")
+	rr.Add("client_token", "fT-9GN8ASwOa9ihWpuokdn:APA91bHW2DbvpDTeJxUA_ACwoLzPkCfJpWqj5N2Eb9H7gYz9D28e1jJH_RRXZoDDMKClZSlXXVosI10BlHGcFgOg1dkkJRm8qCaU9Fci7V2q9ZSRSefw0tA7xW1A_3jl8UU5GG3_uLNL")
 	rr.Add("mode", "login_normal")
 
 	req, err := http.NewRequest(

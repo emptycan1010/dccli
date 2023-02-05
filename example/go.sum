@@ -2,6 +2,8 @@ github.com/emptycan1010/dccli v0.0.0-20230202142741-dcc4631bcf76 h1:tt5T1F4iFOT4
 github.com/emptycan1010/dccli v0.0.0-20230202142741-dcc4631bcf76/go.mod h1:YJ0tHrkS4aMxRPqwcFXs5l8bf0gJ6eeHF39wgW0AhD0=
 github.com/emptycan1010/dcgo v0.0.0-20230202150232-7fe7892ca4eb h1:frWDoy0o4mQX3qZUy3Thw4nNyMLpHjEBvmHCuKf7AdQ=
 github.com/emptycan1010/dcgo v0.0.0-20230202150232-7fe7892ca4eb/go.mod h1:qJa5vP5DwRm/OQWPcWh/EtQxhdzIcTLw7v/dxb5Qvec=
+github.com/emptycan1010/dcgo v0.0.0-20230205130849-56ffeec5a8a3 h1:wWb4YL9kU20p1IVAIqC5K0AE/XBUd9uNqgAT/8/njFo=
+github.com/emptycan1010/dcgo v0.0.0-20230205130849-56ffeec5a8a3/go.mod h1:WVSGODj8x8ozHYmSOU1wNnCUaNBDNfgAQi6weAFSPIM=
 github.com/tidwall/gjson v1.14.4 h1:uo0p8EbA09J7RQaflQ1aBRffTR7xedD2bcIVSYxLnkM=
 github.com/tidwall/gjson v1.14.4/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/match v1.1.1 h1:+Ho715JplO36QYgwN9PGYNhgZvoUSc9X2c80KVTi+GA=

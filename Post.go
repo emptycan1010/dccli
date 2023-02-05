@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/tidwall/gjson"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/tidwall/gjson"
 )
 
 type Post struct {
@@ -114,4 +115,50 @@ func (s *Session) DelPost(gallid string, gno int, pw string) (bool, error) {
 		return false, errors.New("Please refresh your appid")
 	}
 	return gjson.Get(string(bod), "result").Bool(), nil
+}
+
+func (s *Session) RequestPost(gallid string, memoblock []MemoBlock, subject string) (bool, error) {
+	rr := url.Values{}
+	rr.Add("id", gallid)
+	rr.Add("app_id", s.Appid)
+	rr.Add("mode", "write")
+	rr.Add("client_token", "fT-9GN8ASwOa9ihWpuokdn:APA91bHW2DbvpDTeJxUA_ACwoLzPkCfJpWqj5N2Eb9H7gYz9D28e1jJH_RRXZoDDMKClZSlXXVosI10BlHGcFgOg1dkkJRm8qCaU9Fci7V2q9ZSRSefw0tA7xW1A_3jl8UU5GG3_uLNL")
+	rr.Add("subject", subject)                 // Subject, must be encoded into URL
+	rr.Add("name", url.QueryEscape(s.NoLogID)) // Name, must be encoded into URL
+	rr.Add("password", s.NoLogPW)
+	for i := 0; i < len(memoblock); i++ {
+		rr.Add("memo_block["+strconv.Itoa(i)+"]", url.QueryEscape(memoblock[i].Content))
+	}
+	rr.Add("fix", "")
+	rr.Add("secret_use", "0")
+	rr.Add("is_quick", "0")
+
+	req, err := http.NewRequest(
+		"POST",
+		"https://upload.dcinside.com/_app_write_api.php",
+		strings.NewReader(rr.Encode()),
+	)
+	if err != nil {
+		return false, errors.New("Error Making New Request")
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("user-agent", "dcinside.app")
+	req.Header.Set("Host", "upload.dcinside.com")
+	req.Header.Set("referer", "http://www.dcinside.com")
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return false, errors.New("Error Posting Request")
+	}
+	bod, _ := io.ReadAll(res.Body)
+	fmt.Println(string(bod))
+	if gjson.Get(string(bod), "0.cause").String() == "certification" {
+		return false, errors.New("Please refresh your appid")
+	}
+
+	return gjson.Get(string(bod), "result").Bool(), nil
+}
+
+type MemoBlock struct {
+	Content string
 }

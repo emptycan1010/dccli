@@ -27,5 +27,5 @@ func main() {
 	d.GetAppID()
 	memo := []dccli.MemoBlock{}
 	memo = append(memo, dccli.MemoBlock{Content: "<div>test</div>"})
-	fmt.Println(d.RequestPost("tsmanga", memo, "테스트"))
+	fmt.Println(d.RequestPost("tsmanga", "가나마", memo))
 }

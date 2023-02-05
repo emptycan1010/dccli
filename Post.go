@@ -117,9 +117,10 @@ func (s *Session) DelPost(gallid string, gno int, pw string) (bool, error) {
 	return gjson.Get(string(bod), "result").Bool(), nil
 }
 
-func (s *Session) RequestPost(gallid string, memoblock []MemoBlock, subject string) (bool, error) {
+func (s *Session) RequestPost(gallid string, subject string, memoblock []MemoBlock) (bool, error) {
 	rr := url.Values{}
 	rr.Add("id", gallid)
+	s.Appid = "VTExUThCUFRoRklGdTRkbHhscXFqY2RMbEx3dXJFV1liYUVCWVVlKzR1TT0="
 	rr.Add("app_id", s.Appid)
 	rr.Add("mode", "write")
 	rr.Add("client_token", "fT-9GN8ASwOa9ihWpuokdn:APA91bHW2DbvpDTeJxUA_ACwoLzPkCfJpWqj5N2Eb9H7gYz9D28e1jJH_RRXZoDDMKClZSlXXVosI10BlHGcFgOg1dkkJRm8qCaU9Fci7V2q9ZSRSefw0tA7xW1A_3jl8UU5GG3_uLNL")
@@ -129,7 +130,6 @@ func (s *Session) RequestPost(gallid string, memoblock []MemoBlock, subject stri
 	for i := 0; i < len(memoblock); i++ {
 		rr.Add("memo_block["+strconv.Itoa(i)+"]", url.QueryEscape(memoblock[i].Content))
 	}
-	rr.Add("fix", "")
 	rr.Add("secret_use", "0")
 	rr.Add("is_quick", "0")
 
@@ -144,7 +144,7 @@ func (s *Session) RequestPost(gallid string, memoblock []MemoBlock, subject stri
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("user-agent", "dcinside.app")
 	req.Header.Set("Host", "upload.dcinside.com")
-	req.Header.Set("referer", "http://www.dcinside.com")
+	// req.Header.Set("referer", "http://www.dcinside.com")
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
@@ -156,7 +156,7 @@ func (s *Session) RequestPost(gallid string, memoblock []MemoBlock, subject stri
 		return false, errors.New("Please refresh your appid")
 	}
 
-	return gjson.Get(string(bod), "result").Bool(), nil
+	return gjson.Get(string(bod), "0.result").Bool(), nil
 }
 
 type MemoBlock struct {

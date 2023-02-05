@@ -157,8 +157,8 @@ type Account struct {
 	Pw_campaign      int    `json:"pw_campaign"`
 }
 
-func (s *Session) GetGallList(gallid string, appid string) (Getgalldata, error) {
-	req, err := http.NewRequest("GET", HashedURLmake(gallid, appid), nil)
+func (s *Session) GetGallList(gallid string) (Getgalldata, error) {
+	req, err := http.NewRequest("GET", HashedURLmake(gallid, s.Appid), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -224,14 +224,14 @@ func (s *Session) GetAppID() error {
 	return nil
 }
 
-func (s *Session) AddComment(gallid string, appid string, gno int, datgeul string, writer string, pw string) (bool, error) {
+func (s *Session) AddComment(gallid string, gno int, datgeul string, writer string, pw string) (bool, error) {
 	rr := url.Values{}
 	rr.Add("id", gallid)
 	rr.Add("no", strconv.Itoa(gno))
 	rr.Add("comment_nick", writer)
 	rr.Add("comment_pw", pw)
 	rr.Add("client_token", "eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx")
-	rr.Add("app_id", appid)
+	rr.Add("app_id", s.Appid)
 	rr.Add("mode", "com_write")
 	rr.Add("comment_memo", datgeul)
 	req, err := http.NewRequest(
@@ -257,8 +257,8 @@ func (s *Session) AddComment(gallid string, appid string, gno int, datgeul strin
 	return gjson.Get(string(bod), "0.result").Bool(), nil
 }
 
-func (s *Session) GetComment(gallid string, appid string, gno int, commentpage int) (Comment, error) {
-	urld := Base64EncodeLink(fmt.Sprintf("https://app.dcinside.com/api/comment_new.php?id=%s&no=%d&app_id=%s&re_page=%d", gallid, gno, appid, commentpage))
+func (s *Session) GetComment(gallid string, gno int, commentpage int) (Comment, error) {
+	urld := Base64EncodeLink(fmt.Sprintf("https://app.dcinside.com/api/comment_new.php?id=%s&no=%d&app_id=%s&re_page=%d", gallid, gno, s.Appid, commentpage))
 	req, err := http.NewRequest("GET", urld, nil)
 	if err != nil {
 		return Comment{}, errors.New("Error Posting Request")
@@ -280,9 +280,9 @@ func (s *Session) GetComment(gallid string, appid string, gno int, commentpage i
 	return commentlist[0], nil
 }
 
-func (s *Session) GetPost(gallid string, appid string, gno int) (Post, error) {
+func (s *Session) GetPost(gallid string, gno int) (Post, error) {
 	// url is https://app.dcinside.com/api/gall_view_new.php?id=tsmanga&no=1&app_id=T0RtOWkzbFRhVEJndnExU3hmMC80QTV1WVgzQ21SNHdxRS9jRjRocDJUVT0%3D&client_id=eGTqnqzsSzSKYCSWs7LJ8j%3AAPA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx7
-	urld := Base64EncodeLink(fmt.Sprintf("https://app.dcinside.com/api/gall_view_new.php?id=%s&no=%d&app_id=%s&client_id=eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx", gallid, gno, appid))
+	urld := Base64EncodeLink(fmt.Sprintf("https://app.dcinside.com/api/gall_view_new.php?id=%s&no=%d&app_id=%s&client_id=eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx", gallid, gno, s.Appid))
 	req, err := http.NewRequest("GET", urld, nil)
 	if err != nil {
 		return Post{}, errors.New("Error Making Request")
@@ -305,12 +305,12 @@ func (s *Session) GetPost(gallid string, appid string, gno int) (Post, error) {
 	return post[0], nil
 }
 
-func (s *Session) DelPost(gallid string, appid string, gno int, pw string) (bool, error) {
+func (s *Session) DelPost(gallid string, gno int, pw string) (bool, error) {
 	rr := url.Values{}
 	rr.Add("id", gallid)
 	rr.Add("no", strconv.Itoa(gno))
 	rr.Add("write_pw", pw)
-	rr.Add("app_id", appid)
+	rr.Add("app_id", s.Appid)
 	rr.Add("mode", "board_del")
 	rr.Add("client_token", "eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx")
 	req, err := http.NewRequest(
@@ -378,13 +378,13 @@ func (s *Session) Login(id string, pw string) error {
 	}
 } // 객체지향 추가 완?료
 
-func (s *Session) DelComment(gallid string, appid string, gno int, commentno int, pw string) (bool, error) {
+func (s *Session) DelComment(gallid string, gno int, commentno int, pw string) (bool, error) {
 	rr := url.Values{}
 	rr.Add("id", gallid)
 	rr.Add("no", strconv.Itoa(gno))
 	rr.Add("comment_no", strconv.Itoa(commentno))
 	rr.Add("comment_pw", pw)
-	rr.Add("app_id", appid)
+	rr.Add("app_id", s.Appid)
 	rr.Add("mode", "comment_del")
 	rr.Add("client_token", "eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx")
 	req, err := http.NewRequest(
@@ -445,3 +445,5 @@ func New() *Session {
 //	bod, _ := io.ReadAll(res.Body)
 //	fmt.Println(string(bod)) // Must get fid, appid,
 //}
+
+// 위에꺼 FCM토큰관련한건데 아직 작동도안하고 수정할거많아서 일단 주석처리함

@@ -22,4 +22,5 @@ func main() {
 	// fmt.Println(res)
 	// r, _ := dccli.Login("adfasdfasdf", "111@")
 	print(dccli.DelComment("tsmanga", appid, 1, 39, "1111"))
+	// c := dccli.New()
 }

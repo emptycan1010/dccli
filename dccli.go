@@ -15,6 +15,15 @@ import (
 	"strings"
 )
 
+type Session struct {
+	Account    Account
+	isLoggedin bool
+	Appid      string
+	Apptoken   string
+	NowGallID  string
+	NowPostNo  int
+}
+
 type AppCheckstruct struct {
 	Result        bool   `json:"result"`
 	Ver           string `json:"ver"`
@@ -148,7 +157,7 @@ type Account struct {
 	Pw_campaign      int    `json:"pw_campaign"`
 }
 
-func GetGallList(gallid string, appid string) (Getgalldata, error) {
+func (s *Session) GetGallList(gallid string, appid string) (Getgalldata, error) {
 	req, err := http.NewRequest("GET", HashedURLmake(gallid, appid), nil)
 	if err != nil {
 		log.Fatal(err)
@@ -184,7 +193,7 @@ func Base64EncodeLink(input string) string {
 	return fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString([]byte(input)))
 }
 
-func GetAppID() (string, error) {
+func (s *Session) GetAppID() error {
 	res, err := http.Get("http://json2.dcinside.com/json0/app_check_A_rina.php")
 	if err != nil {
 		log.Fatal(err)
@@ -208,13 +217,14 @@ func GetAppID() (string, error) {
 		},
 	)
 	if err != nil {
-		return "", errors.New("Error GetAppID function")
+		return errors.New("Error GetAppID function")
 	}
 	bod, _ = io.ReadAll(res.Body)
-	return string(bod), nil
+	s.Appid = gjson.Get(string(bod), "app_id").String()
+	return nil
 }
 
-func AddComment(gallid string, appid string, gno int, datgeul string, writer string, pw string) (bool, error) {
+func (s *Session) AddComment(gallid string, appid string, gno int, datgeul string, writer string, pw string) (bool, error) {
 	rr := url.Values{}
 	rr.Add("id", gallid)
 	rr.Add("no", strconv.Itoa(gno))
@@ -247,7 +257,7 @@ func AddComment(gallid string, appid string, gno int, datgeul string, writer str
 	return gjson.Get(string(bod), "0.result").Bool(), nil
 }
 
-func GetComment(gallid string, appid string, gno int, commentpage int) (Comment, error) {
+func (s *Session) GetComment(gallid string, appid string, gno int, commentpage int) (Comment, error) {
 	urld := Base64EncodeLink(fmt.Sprintf("https://app.dcinside.com/api/comment_new.php?id=%s&no=%d&app_id=%s&re_page=%d", gallid, gno, appid, commentpage))
 	req, err := http.NewRequest("GET", urld, nil)
 	if err != nil {
@@ -270,7 +280,7 @@ func GetComment(gallid string, appid string, gno int, commentpage int) (Comment,
 	return commentlist[0], nil
 }
 
-func GetPost(gallid string, appid string, gno int) (Post, error) {
+func (s *Session) GetPost(gallid string, appid string, gno int) (Post, error) {
 	// url is https://app.dcinside.com/api/gall_view_new.php?id=tsmanga&no=1&app_id=T0RtOWkzbFRhVEJndnExU3hmMC80QTV1WVgzQ21SNHdxRS9jRjRocDJUVT0%3D&client_id=eGTqnqzsSzSKYCSWs7LJ8j%3AAPA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx7
 	urld := Base64EncodeLink(fmt.Sprintf("https://app.dcinside.com/api/gall_view_new.php?id=%s&no=%d&app_id=%s&client_id=eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx", gallid, gno, appid))
 	req, err := http.NewRequest("GET", urld, nil)
@@ -295,7 +305,7 @@ func GetPost(gallid string, appid string, gno int) (Post, error) {
 	return post[0], nil
 }
 
-func DelPost(gallid string, appid string, gno int, pw string) (bool, error) {
+func (s *Session) DelPost(gallid string, appid string, gno int, pw string) (bool, error) {
 	rr := url.Values{}
 	rr.Add("id", gallid)
 	rr.Add("no", strconv.Itoa(gno))
@@ -325,7 +335,10 @@ func DelPost(gallid string, appid string, gno int, pw string) (bool, error) {
 	return gjson.Get(string(bod), "result").Bool(), nil
 }
 
-func Login(id string, pw string) (Account, error) {
+func (s *Session) Login(id string, pw string) error {
+	if s.isLoggedin == true {
+		return errors.New("Already logged in")
+	}
 	rr := url.Values{}
 	rr.Add("user_id", id)
 	rr.Add("user_pw", pw)
@@ -338,7 +351,7 @@ func Login(id string, pw string) (Account, error) {
 		strings.NewReader(rr.Encode()),
 	)
 	if err != nil {
-		return Account{}, errors.New("Error Making Request")
+		return errors.New("Error Making Request")
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("user-agent", "dcinside.app")
@@ -349,17 +362,23 @@ func Login(id string, pw string) (Account, error) {
 	res, err := client.Do(req)
 
 	if err != nil {
-		return Account{}, errors.New("Error Posting Request")
+		return errors.New("Error Posting Request")
 	}
 	bod, _ := io.ReadAll(res.Body)
 	// fmt.Println(string(bod))
 	var account Account
 	json.Unmarshal(bod, &account)
 	// fmt.Println(account)
-	return account, nil
-}
+	if account.Result == true {
+		s.isLoggedin = true
+		s.Account = account
+		return nil
+	} else {
+		return errors.New("Failed to Log in")
+	}
+} // 객체지향 추가 완?료
 
-func DelComment(gallid string, appid string, gno int, commentno int, pw string) (bool, error) {
+func (s *Session) DelComment(gallid string, appid string, gno int, commentno int, pw string) (bool, error) {
 	rr := url.Values{}
 	rr.Add("id", gallid)
 	rr.Add("no", strconv.Itoa(gno))
@@ -387,4 +406,10 @@ func DelComment(gallid string, appid string, gno int, commentno int, pw string) 
 	}
 	bod, _ := io.ReadAll(res.Body)
 	return gjson.Get(string(bod), "0.result").Bool(), nil
+}
+
+func New() *Session {
+	p := &Session{}
+	p.isLoggedin = false
+	return p
 }

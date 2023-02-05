@@ -120,7 +120,6 @@ func (s *Session) DelPost(gallid string, gno int, pw string) (bool, error) {
 func (s *Session) RequestPost(gallid string, subject string, memoblock []MemoBlock) (bool, error) {
 	rr := url.Values{}
 	rr.Add("id", gallid)
-	s.Appid = "VTExUThCUFRoRklGdTRkbHhscXFqY2RMbEx3dXJFV1liYUVCWVVlKzR1TT0="
 	rr.Add("app_id", s.Appid)
 	rr.Add("mode", "write")
 	rr.Add("client_token", "fT-9GN8ASwOa9ihWpuokdn:APA91bHW2DbvpDTeJxUA_ACwoLzPkCfJpWqj5N2Eb9H7gYz9D28e1jJH_RRXZoDDMKClZSlXXVosI10BlHGcFgOg1dkkJRm8qCaU9Fci7V2q9ZSRSefw0tA7xW1A_3jl8UU5GG3_uLNL")

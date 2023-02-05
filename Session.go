@@ -1,17 +1,19 @@
 package dccli
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/tidwall/gjson"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/tidwall/gjson"
 )
 
 type Session struct {
@@ -160,36 +162,36 @@ func New() *Session {
 	return p
 }
 
-//func (s *Session) FetchFCMToken() {
-//	r, e := http.NewRequest("POST", "https://firebaseinstallations.googleapis.com/v1/projects/dcinside-b3f40/installations", nil)
-//	if e != nil {
-//		panic(e)
-//	}
-//
-//	r.Header.Set("accept", "application/json")
-//	r.Header.Set("accept-encoding", "gzip")
-//	r.Header.Set("cache-control", "no-cache")
-//	r.Header.Set("connection", "Keep-Alive")
-//	r.Header.Set("content-encoding", "gzip")
-//	r.Header.Set("host", "firebaseinstallations.googleapis.com")
-//	r.Header.Set("user-agent", "Dalvik/2.1.0 (Linux; U; Android 13; Pixel 5 Build/TP1A.221105.002)")
-//	r.Header.Set("x-android-cert", "43BD70DFC365EC1749F0424D28174DA44EE7659D")
-//	r.Header.Set("x-android-package", "com.dcinside.app.android")
-//	r.Header.Set("x-firebase-client", "H4sIAAAAAAAAAKtWykhNLCpJSk0sKVayio7VUSpLLSrOzM9TslIyUqoFAFyivEQfAAAA")
-//	r.Header.Set("x-goog-api-key", "AIzaSyDcbVof_4Bi2GwJ1H8NjSwSTaMPPZeCE38")
-//	b := bytes.NewBuffer([]byte(`{
-//  "fid": "f7RXAqYIR6iACLGVP06qb4",
-//  "appId": "1:477369754343:android:d2ffdd960120a207727842",
-//  "authVersion": "FIS_v2",
-//  "sdkVersion": "a:17.0.2"}`))
-//	r.Body = io.NopCloser(b)
-//	client := &http.Client{}
-//	res, err := client.Do(r)
-//	if err != nil {
-//		panic(err)
-//	}
-//	bod, _ := io.ReadAll(res.Body)
-//	fmt.Println(string(bod)) // Must get fid, appid,
-//}
+func (s *Session) FetchFCMToken() {
+	r, e := http.NewRequest("POST", "https://firebaseinstallations.googleapis.com/v1/projects/dcinside-b3f40/installations", nil)
+	if e != nil {
+		panic(e)
+	}
+	r.Header.Set("accept", "application/json")
+	r.Header.Set("accept-encoding", "gzip")
+	r.Header.Set("cache-control", "no-cache")
+	r.Header.Set("connection", "Keep-Alive")
+	r.Header.Set("content-encoding", "gzip")
+	// r.Header.Set("content-type", "application/json")
+	r.Header.Set("host", "firebaseinstallations.googleapis.com")
+	r.Header.Set("user-agent", "Dalvik/2.1.0 (Linux; U; Android 13; Pixel 5 Build/TP1A.221105.002)")
+	r.Header.Set("x-android-cert", "43BD70DFC365EC1749F0424D28174DA44EE7659D")
+	r.Header.Set("x-android-package", "com.dcinside.app.android")
+	r.Header.Set("x-firebase-client", "H4sIAAAAAAAAAKtWykhNLCpJSk0sKVayio7VUSpLLSrOzM9TslIyUqoFAFyivEQfAAAA")
+	r.Header.Set("x-goog-api-key", "AIzaSyDcbVof_4Bi2GwJ1H8NjSwSTaMPPZeCE38")
+	b := bytes.NewBuffer([]byte(`{
+ "fid": "f7RXAqYIR6iACLGVP06qb4",
+ "appId": "1:477369754343:android:d2ffdd960120a207727842",
+ "authVersion": "FIS_v2",
+ "sdkVersion": "a:17.0.2"}`))
+	r.Body = io.NopCloser(b)
+	client := &http.Client{}
+	res, err := client.Do(r)
+	if err != nil {
+		panic(err)
+	}
+	bod, _ := io.ReadAll(res.Body)
+	fmt.Println(string(bod))
+}
 
 // 위에꺼 FCM토큰관련한건데 아직 작동도안하고 수정할거많아서 일단 주석처리함

@@ -158,6 +158,20 @@ type Account struct {
 	Pw_campaign      int    `json:"pw_campaign"`
 }
 
+func HashedURLmake(gallid string, appid string) string {
+	input := []byte(
+		fmt.Sprintf("https://app.dcinside.com/api/gall_list_new.php?id=%s&page=1&app_id=%s",
+			gallid,
+			appid,
+		),
+	)
+	return fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString(input))
+}
+
+func Base64EncodeLink(input string) string {
+	return fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString([]byte(input)))
+}
+
 func (s *Session) GetGallList(gallid string) (Getgalldata, error) {
 	req, err := http.NewRequest("GET", HashedURLmake(gallid, s.Appid), nil)
 	if err != nil {
@@ -181,20 +195,6 @@ func (s *Session) GetGallList(gallid string) (Getgalldata, error) {
 		return Getgalldata{}, errors.New("Error Unmarshaling Json")
 	}
 	return gg[0], nil
-}
-
-func HashedURLmake(gallid string, appid string) string {
-	input := []byte(
-		fmt.Sprintf("https://app.dcinside.com/api/gall_list_new.php?id=%s&page=1&app_id=%s",
-			gallid,
-			appid,
-		),
-	)
-	return fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString(input))
-}
-
-func Base64EncodeLink(input string) string {
-	return fmt.Sprintf("https://app.dcinside.com/api/redirect.php?hash=%s", base64.StdEncoding.EncodeToString([]byte(input)))
 }
 
 func (s *Session) GetAppID() error {

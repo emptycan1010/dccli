@@ -6,13 +6,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/tidwall/gjson"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/tidwall/gjson"
 )
 
 type Session struct {
@@ -171,6 +172,9 @@ func (s *Session) GetGallList(gallid string) (Getgalldata, error) {
 		return Getgalldata{}, errors.New("Error Posting Request")
 	}
 	bod, _ := io.ReadAll(res.Body)
+	if gjson.Get(string(bod), "0.result").Exists() == true {
+		return Getgalldata{}, errors.New("Please refresh your Appid")
+	}
 	var gg []Getgalldata
 	err = json.Unmarshal(bod, &gg)
 	if err != nil {
@@ -254,6 +258,9 @@ func (s *Session) AddComment(gallid string, gno int, datgeul string, writer stri
 		return false, errors.New("Error Posting Request")
 	}
 	bod, _ := io.ReadAll(res.Body)
+	if gjson.Get(string(bod), "0.result").Exists() == true {
+		return false, errors.New("Please refresh your appid")
+	}
 	return gjson.Get(string(bod), "0.result").Bool(), nil
 }
 
@@ -273,6 +280,10 @@ func (s *Session) GetComment(gallid string, gno int, commentpage int) (Comment, 
 	}
 	var commentlist []Comment
 	bod, _ := io.ReadAll(res.Body)
+	// fmt.Println(string(bod))
+	if gjson.Get(string(bod), "0.result").Exists() == true {
+		return Comment{}, errors.New("Please refresh your appid")
+	}
 	err = json.Unmarshal(bod, &commentlist)
 	if err != nil {
 		return Comment{}, errors.New("Error while parsing json")
@@ -297,6 +308,9 @@ func (s *Session) GetPost(gallid string, gno int) (Post, error) {
 	}
 	bod, _ := io.ReadAll(res.Body)
 	// fmt.Println(string(bod))
+	if gjson.Get(string(bod), "0.result").Exists() == true {
+		return Post{}, errors.New("Please refresh your appid")
+	}
 	var post []Post
 	err = json.Unmarshal(bod, &post)
 	if err != nil {
@@ -332,6 +346,9 @@ func (s *Session) DelPost(gallid string, gno int, pw string) (bool, error) {
 		return false, errors.New("Error Posting Request")
 	}
 	bod, _ := io.ReadAll(res.Body)
+	if gjson.Get(string(bod), "0.result").Exists() == true {
+		return false, errors.New("Please refresh your appid")
+	}
 	return gjson.Get(string(bod), "result").Bool(), nil
 }
 
@@ -405,6 +422,10 @@ func (s *Session) DelComment(gallid string, gno int, commentno int, pw string) (
 		return false, errors.New("Error Posting Request")
 	}
 	bod, _ := io.ReadAll(res.Body)
+
+	if gjson.Get(string(bod), "0.cause").String() == "certification" {
+		return false, errors.New("Please refresh your appid")
+	}
 	return gjson.Get(string(bod), "0.result").Bool(), nil
 }
 

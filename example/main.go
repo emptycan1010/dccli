@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	dccli "github.com/emptycan1010/dcgo"
 )
 
@@ -20,5 +22,11 @@ func main() {
 	// r, _ := dccli.Login("adfasdfasdf", "111@")
 	// print(dccli.DelComment("tsmanga", appid, 1, 39, "1111"))
 	d := dccli.New()
-	d.FetchFCMToken()
+	// d.GetAppID()
+	r, e := d.DelComment("tsmanga", 1, 39, "1111")
+	if e != nil {
+		panic(e)
+	}
+	fmt.Println(r)
+
 }

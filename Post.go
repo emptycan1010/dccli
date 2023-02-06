@@ -91,7 +91,7 @@ func (s *Session) DelPost(gallid string, gno int, pw string) (bool, error) {
 	rr.Add("write_pw", pw)
 	rr.Add("app_id", s.Appid)
 	rr.Add("mode", "board_del")
-	rr.Add("client_token", "eGTqnqzsSzSKYCSWs7LJ8j:APA91bGCO-S2Y5IRfBlK9rWqYGBMcWc15ynPo6nDz7RczKnfURdbkYldx1-7F-sXcrFCdBD86kWqNFTGfnH2-rWmPnnBD3nU6SAtRoVSu3bZ_DwJgG4nmvHc824BGAiB49U-Aq8XXnlx")
+	rr.Add("client_token", s.FCM.Token)
 	req, err := http.NewRequest(
 		"POST",
 		"https://app.dcinside.com/api/gall_del.php",
@@ -122,7 +122,7 @@ func (s *Session) RequestPost(gallid string, subject string, memoblock []MemoBlo
 	rr.Add("id", gallid)
 	rr.Add("app_id", s.Appid)
 	rr.Add("mode", "write")
-	rr.Add("client_token", "fT-9GN8ASwOa9ihWpuokdn:APA91bHW2DbvpDTeJxUA_ACwoLzPkCfJpWqj5N2Eb9H7gYz9D28e1jJH_RRXZoDDMKClZSlXXVosI10BlHGcFgOg1dkkJRm8qCaU9Fci7V2q9ZSRSefw0tA7xW1A_3jl8UU5GG3_uLNL")
+	rr.Add("client_token", s.FCM.Token)
 	rr.Add("subject", subject)                 // Subject, must be encoded into URL
 	rr.Add("name", url.QueryEscape(s.NoLogID)) // Name, must be encoded into URL
 	rr.Add("password", s.NoLogPW)

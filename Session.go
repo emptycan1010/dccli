@@ -101,7 +101,7 @@ func (s *Session) GetAppID() error {
 		url.Values{
 			"value_token":  {fmt.Sprintf("%x", h.Sum(nil))},
 			"signature":    {"ReOo4u96nnv8Njd7707KpYiIVYQ3FlcKHDJE046Pg6s="},
-			"client_token": {"fT-9GN8ASwOa9ihWpuokdn:APA91bHW2DbvpDTeJxUA_ACwoLzPkCfJpWqj5N2Eb9H7gYz9D28e1jJH_RRXZoDDMKClZSlXXVosI10BlHGcFgOg1dkkJRm8qCaU9Fci7V2q9ZSRSefw0tA7xW1A_3jl8UU5GG3_uLNL"},
+			"client_token": {s.FCM.Token},
 		},
 	)
 	if err != nil {
@@ -119,7 +119,7 @@ func (s *Session) Login(id string, pw string) error {
 	rr := url.Values{}
 	rr.Add("user_id", id)
 	rr.Add("user_pw", pw)
-	rr.Add("client_token", "fT-9GN8ASwOa9ihWpuokdn:APA91bHW2DbvpDTeJxUA_ACwoLzPkCfJpWqj5N2Eb9H7gYz9D28e1jJH_RRXZoDDMKClZSlXXVosI10BlHGcFgOg1dkkJRm8qCaU9Fci7V2q9ZSRSefw0tA7xW1A_3jl8UU5GG3_uLNL")
+	rr.Add("client_token", s.FCM.Token)
 	rr.Add("mode", "login_normal")
 
 	req, err := http.NewRequest(

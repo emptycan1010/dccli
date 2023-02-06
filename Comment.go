@@ -39,7 +39,7 @@ func (s *Session) AddComment(gallid string, gno int, datgeul string, writer stri
 	rr.Add("no", strconv.Itoa(gno))
 	rr.Add("comment_nick", writer)
 	rr.Add("comment_pw", pw)
-	rr.Add("client_token", "fT-9GN8ASwOa9ihWpuokdn:APA91bHW2DbvpDTeJxUA_ACwoLzPkCfJpWqj5N2Eb9H7gYz9D28e1jJH_RRXZoDDMKClZSlXXVosI10BlHGcFgOg1dkkJRm8qCaU9Fci7V2q9ZSRSefw0tA7xW1A_3jl8UU5GG3_uLNL")
+	rr.Add("client_token", s.FCM.Token)
 	rr.Add("app_id", s.Appid)
 	rr.Add("mode", "com_write")
 	rr.Add("comment_memo", datgeul)
@@ -104,7 +104,7 @@ func (s *Session) DelComment(gallid string, gno int, commentno int, pw string) (
 	rr.Add("comment_pw", pw)
 	rr.Add("app_id", s.Appid)
 	rr.Add("mode", "comment_del")
-	rr.Add("client_token", "fT-9GN8ASwOa9ihWpuokdn:APA91bHW2DbvpDTeJxUA_ACwoLzPkCfJpWqj5N2Eb9H7gYz9D28e1jJH_RRXZoDDMKClZSlXXVosI10BlHGcFgOg1dkkJRm8qCaU9Fci7V2q9ZSRSefw0tA7xW1A_3jl8UU5GG3_uLNL")
+	rr.Add("client_token", s.FCM.Token)
 	req, err := http.NewRequest(
 		"POST",
 		"https://app.dcinside.com/api/comment_del.php",

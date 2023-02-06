@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math/rand"
 	"net/http"
 	"net/url"
 	"strings"
@@ -27,6 +26,7 @@ type Session struct {
 	Apptoken   string
 	NowGallID  string
 	NowPostNo  int
+	FCM        AccountFCM
 }
 
 type AppCheckstruct struct {
@@ -204,7 +204,13 @@ func (s *Session) FetchFCMToken() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(bod))
+	// fmt.Println(string(bod))
+	var accountFCM AccountFCM
+	e = json.Unmarshal(bod, &accountFCM)
+	if e != nil {
+		panic(e)
+	}
+	s.FCM = accountFCM
 	// 이제 토큰가져오면됨 ㅋㅋ
 
 	rr := url.Values{}
@@ -231,16 +237,17 @@ func (s *Session) FetchFCMToken() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(bod))
-
+	// fmt.Println(string(bod))
+	s.FCM.Token = string(bod)[6:]
 }
 
-func RandomString(n int) string {
-	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-	s := make([]rune, n)
-	for i := range s {
-		s[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(s)
+type AccountFCM struct {
+	Name         string `json:"name"`
+	Fid          string `json:"fid"`
+	RefreshToken string `json:"refreshToken"`
+	AuthToken    struct {
+		Token     string `json:"token"`
+		ExpiresIn string `json:"expiresIn"`
+	} `json:"authToken"`
+	Token string
 }

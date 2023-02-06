@@ -123,8 +123,8 @@ func (s *Session) RequestPost(gallid string, subject string, memoblock []MemoBlo
 	rr.Add("app_id", s.Appid)
 	rr.Add("mode", "write")
 	rr.Add("client_token", s.FCM.Token)
-	rr.Add("subject", subject)                 // Subject, must be encoded into URL
-	rr.Add("name", url.QueryEscape(s.NoLogID)) // Name, must be encoded into URL
+	rr.Add("subject", url.QueryEscape(subject)) // Subject, must be encoded into URL
+	rr.Add("name", url.QueryEscape(s.NoLogID))  // Name, must be encoded into URL
 	rr.Add("password", s.NoLogPW)
 	for i := 0; i < len(memoblock); i++ {
 		rr.Add("memo_block["+strconv.Itoa(i)+"]", url.QueryEscape(memoblock[i].Content))
@@ -143,14 +143,13 @@ func (s *Session) RequestPost(gallid string, subject string, memoblock []MemoBlo
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("user-agent", "dcinside.app")
 	req.Header.Set("Host", "upload.dcinside.com")
-	// req.Header.Set("referer", "http://www.dcinside.com")
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
 		return false, errors.New("Error Posting Request")
 	}
 	bod, _ := io.ReadAll(res.Body)
-	fmt.Println(string(bod))
+	//fmt.Println(string(bod))
 	if gjson.Get(string(bod), "0.cause").String() == "certification" {
 		return false, errors.New("Please refresh your appid")
 	}

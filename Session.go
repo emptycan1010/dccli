@@ -2,6 +2,7 @@ package dccli
 
 import (
 	"bytes"
+	"compress/gzip"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
@@ -9,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"strings"
@@ -179,19 +181,66 @@ func (s *Session) FetchFCMToken() {
 	r.Header.Set("x-android-package", "com.dcinside.app.android")
 	r.Header.Set("x-firebase-client", "H4sIAAAAAAAAAKtWykhNLCpJSk0sKVayio7VUSpLLSrOzM9TslIyUqoFAFyivEQfAAAA")
 	r.Header.Set("x-goog-api-key", "AIzaSyDcbVof_4Bi2GwJ1H8NjSwSTaMPPZeCE38")
-	b := bytes.NewBuffer([]byte(`{
- "fid": "f7RXAqYIR6iACLGVP06qb4",
- "appId": "1:477369754343:android:d2ffdd960120a207727842",
- "authVersion": "FIS_v2",
- "sdkVersion": "a:17.0.2"}`))
+	b := bytes.NewBuffer(
+		[]byte(
+			`{
+		"fid": "",
+		"appId": "1:477369754343:android:d2ffdd960120a207727842",
+		"authVersion": "FIS_v2",
+		"sdkVersion": "a:17.0.2"}`,
+		),
+	)
 	r.Body = io.NopCloser(b)
 	client := &http.Client{}
 	res, err := client.Do(r)
 	if err != nil {
 		panic(err)
 	}
-	bod, _ := io.ReadAll(res.Body)
+	gReader, err := gzip.NewReader(res.Body)
+	if err != nil {
+		panic(err)
+	}
+	bod, err := io.ReadAll(gReader)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println(string(bod))
+	// 이제 토큰가져오면됨 ㅋㅋ
+
+	rr := url.Values{}
+	rr.Add("X-subtype", "477369754343")
+	rr.Add("sender", "477369754343")
+	rr.Add("X-appid", gjson.Get(string(bod), "fid").String())
+	rr.Add("X-Goog-Firebase-Installations-Auth", gjson.Get(string(bod), "authToken.token").String())
+	rr.Add("app", "com.dcinside.app.android")
+	rr.Add("device", "3966377448498170683")
+
+	r, e = http.NewRequest("POST", "https://android.apis.google.com/c2dm/register3", strings.NewReader(rr.Encode()))
+	if e != nil {
+		panic(e)
+	}
+	r.Header.Set("authorization", "AidLogin 3966377448498170683:2982263657081238075")
+	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Set("host", "android.apis.google.com")
+	client = &http.Client{}
+	res, err = client.Do(r)
+	if err != nil {
+		panic(err)
+	}
+	bod, err = io.ReadAll(res.Body)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(bod))
+
 }
 
-// 위에꺼 FCM토큰관련한건데 아직 작동도안하고 수정할거많아서 일단 주석처리함
+func RandomString(n int) string {
+	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+	s := make([]rune, n)
+	for i := range s {
+		s[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(s)
+}

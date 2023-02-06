@@ -1,17 +1,20 @@
 package dccli
 
 import (
+	"bytes"
+	"compress/gzip"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/tidwall/gjson"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/tidwall/gjson"
 )
 
 type Session struct {
@@ -23,6 +26,7 @@ type Session struct {
 	Apptoken   string
 	NowGallID  string
 	NowPostNo  int
+	FCM        AccountFCM
 }
 
 type AppCheckstruct struct {
@@ -160,36 +164,90 @@ func New() *Session {
 	return p
 }
 
-//func (s *Session) FetchFCMToken() {
-//	r, e := http.NewRequest("POST", "https://firebaseinstallations.googleapis.com/v1/projects/dcinside-b3f40/installations", nil)
-//	if e != nil {
-//		panic(e)
-//	}
-//
-//	r.Header.Set("accept", "application/json")
-//	r.Header.Set("accept-encoding", "gzip")
-//	r.Header.Set("cache-control", "no-cache")
-//	r.Header.Set("connection", "Keep-Alive")
-//	r.Header.Set("content-encoding", "gzip")
-//	r.Header.Set("host", "firebaseinstallations.googleapis.com")
-//	r.Header.Set("user-agent", "Dalvik/2.1.0 (Linux; U; Android 13; Pixel 5 Build/TP1A.221105.002)")
-//	r.Header.Set("x-android-cert", "43BD70DFC365EC1749F0424D28174DA44EE7659D")
-//	r.Header.Set("x-android-package", "com.dcinside.app.android")
-//	r.Header.Set("x-firebase-client", "H4sIAAAAAAAAAKtWykhNLCpJSk0sKVayio7VUSpLLSrOzM9TslIyUqoFAFyivEQfAAAA")
-//	r.Header.Set("x-goog-api-key", "AIzaSyDcbVof_4Bi2GwJ1H8NjSwSTaMPPZeCE38")
-//	b := bytes.NewBuffer([]byte(`{
-//  "fid": "f7RXAqYIR6iACLGVP06qb4",
-//  "appId": "1:477369754343:android:d2ffdd960120a207727842",
-//  "authVersion": "FIS_v2",
-//  "sdkVersion": "a:17.0.2"}`))
-//	r.Body = io.NopCloser(b)
-//	client := &http.Client{}
-//	res, err := client.Do(r)
-//	if err != nil {
-//		panic(err)
-//	}
-//	bod, _ := io.ReadAll(res.Body)
-//	fmt.Println(string(bod)) // Must get fid, appid,
-//}
+func (s *Session) FetchFCMToken() {
+	r, e := http.NewRequest("POST", "https://firebaseinstallations.googleapis.com/v1/projects/dcinside-b3f40/installations", nil)
+	if e != nil {
+		panic(e)
+	}
+	r.Header.Set("accept", "application/json")
+	r.Header.Set("accept-encoding", "gzip")
+	r.Header.Set("cache-control", "no-cache")
+	r.Header.Set("connection", "Keep-Alive")
+	r.Header.Set("content-encoding", "gzip")
+	// r.Header.Set("content-type", "application/json")
+	r.Header.Set("host", "firebaseinstallations.googleapis.com")
+	r.Header.Set("user-agent", "Dalvik/2.1.0 (Linux; U; Android 13; Pixel 5 Build/TP1A.221105.002)")
+	r.Header.Set("x-android-cert", "43BD70DFC365EC1749F0424D28174DA44EE7659D")
+	r.Header.Set("x-android-package", "com.dcinside.app.android")
+	r.Header.Set("x-firebase-client", "H4sIAAAAAAAAAKtWykhNLCpJSk0sKVayio7VUSpLLSrOzM9TslIyUqoFAFyivEQfAAAA")
+	r.Header.Set("x-goog-api-key", "AIzaSyDcbVof_4Bi2GwJ1H8NjSwSTaMPPZeCE38")
+	b := bytes.NewBuffer(
+		[]byte(
+			`{
+		"fid": "",
+		"appId": "1:477369754343:android:d2ffdd960120a207727842",
+		"authVersion": "FIS_v2",
+		"sdkVersion": "a:17.0.2"}`,
+		),
+	)
+	r.Body = io.NopCloser(b)
+	client := &http.Client{}
+	res, err := client.Do(r)
+	if err != nil {
+		panic(err)
+	}
+	gReader, err := gzip.NewReader(res.Body)
+	if err != nil {
+		panic(err)
+	}
+	bod, err := io.ReadAll(gReader)
+	if err != nil {
+		panic(err)
+	}
+	// fmt.Println(string(bod))
+	var accountFCM AccountFCM
+	e = json.Unmarshal(bod, &accountFCM)
+	if e != nil {
+		panic(e)
+	}
+	s.FCM = accountFCM
+	// 이제 토큰가져오면됨 ㅋㅋ
 
-// 위에꺼 FCM토큰관련한건데 아직 작동도안하고 수정할거많아서 일단 주석처리함
+	rr := url.Values{}
+	rr.Add("X-subtype", "477369754343")
+	rr.Add("sender", "477369754343")
+	rr.Add("X-appid", gjson.Get(string(bod), "fid").String())
+	rr.Add("X-Goog-Firebase-Installations-Auth", gjson.Get(string(bod), "authToken.token").String())
+	rr.Add("app", "com.dcinside.app.android")
+	rr.Add("device", "3966377448498170683")
+
+	r, e = http.NewRequest("POST", "https://android.apis.google.com/c2dm/register3", strings.NewReader(rr.Encode()))
+	if e != nil {
+		panic(e)
+	}
+	r.Header.Set("authorization", "AidLogin 3966377448498170683:2982263657081238075")
+	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Set("host", "android.apis.google.com")
+	client = &http.Client{}
+	res, err = client.Do(r)
+	if err != nil {
+		panic(err)
+	}
+	bod, err = io.ReadAll(res.Body)
+	if err != nil {
+		panic(err)
+	}
+	// fmt.Println(string(bod))
+	s.FCM.Token = string(bod)[6:]
+}
+
+type AccountFCM struct {
+	Name         string `json:"name"`
+	Fid          string `json:"fid"`
+	RefreshToken string `json:"refreshToken"`
+	AuthToken    struct {
+		Token     string `json:"token"`
+		ExpiresIn string `json:"expiresIn"`
+	} `json:"authToken"`
+	Token string
+}

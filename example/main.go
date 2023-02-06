@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	dccli "github.com/emptycan1010/dcgo"
 )
 
@@ -22,10 +20,11 @@ func main() {
 	// r, _ := dccli.Login("adfasdfasdf", "111@")
 	// print(dccli.DelComment("tsmanga", appid, 1, 39, "1111"))
 	d := dccli.New()
-	d.NoLogID = "ㅇㅇ"
-	d.NoLogPW = "1111"
-	d.GetAppID()
-	memo := []dccli.MemoBlock{}
-	memo = append(memo, dccli.MemoBlock{Content: "<div>test</div>"})
-	fmt.Println(d.RequestPost("tsmanga", "가나마", memo))
+	// d.NoLogID = "ㅇㅇ"
+	// d.NoLogPW = "1111"
+	// d.GetAppID()
+	// memo := []dccli.MemoBlock{}
+	// memo = append(memo, dccli.MemoBlock{Content: "<div>test</div>"})
+	// fmt.Println(d.RequestPost("tsmanga", "가나마", memo))
+	d.FetchFCMToken()
 }

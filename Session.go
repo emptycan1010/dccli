@@ -109,6 +109,9 @@ func (s *Session) GetAppID() error {
 	}
 	bod, _ = io.ReadAll(res.Body)
 	s.Appid = gjson.Get(string(bod), "app_id").String()
+	if gjson.Get(string(bod), "result").Bool() == false {
+		return errors.New("Error GetAppID function")
+	}
 	return nil
 }
 

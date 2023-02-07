@@ -96,18 +96,36 @@ func (s *Session) GetAppID() error {
 	}
 	h := sha256.New()
 	h.Write([]byte(fmt.Sprintf("dcArdchk_%s", Appc[0].Date))) // value token calculated
-	res, err = http.PostForm(
+	// res, err = http.PostForm(
+	// 	"https://msign.dcinside.com/auth/mobile_app_verification",
+	// 	url.Values{
+	// 		"value_token":  {fmt.Sprintf("%x", h.Sum(nil))},
+	// 		"signature":    {"ReOo4u96nnv8Njd7707KpYiIVYQ3FlcKHDJE046Pg6s="},
+	// 		"client_token": {s.FCM.Token},
+	// 	},
+	// )
+
+	req, err := http.NewRequest(
+		"POST",
 		"https://msign.dcinside.com/auth/mobile_app_verification",
-		url.Values{
+		strings.NewReader(url.Values{
 			"value_token":  {fmt.Sprintf("%x", h.Sum(nil))},
 			"signature":    {"ReOo4u96nnv8Njd7707KpYiIVYQ3FlcKHDJE046Pg6s="},
 			"client_token": {s.FCM.Token},
-		},
+		}.Encode()),
 	)
 	if err != nil {
-		return errors.New("Error GetAppID function")
+		return errors.New("Error Making Request")
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("User-Agent", "dcinside.app")
+	client := &http.Client{}
+	res, err = client.Do(req)
+	if err != nil {
+		return errors.New("Error Posting Request")
 	}
 	bod, _ = io.ReadAll(res.Body)
+	fmt.Println(string(bod))
 	s.Appid = gjson.Get(string(bod), "app_id").String()
 	if gjson.Get(string(bod), "result").Bool() == false {
 		return errors.New("Error GetAppID function")

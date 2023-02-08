@@ -28,8 +28,9 @@ func main() {
 	// memo := []dccli.MemoBlock{}
 	// memo = append(memo, dccli.MemoBlock{Content: "<div>test</div>"})
 	// fmt.Println(d.RequestPost("tsmanga", "가나마", memo))
-	d.GetAppID()
 	d.FetchFCMToken()
+	d.GetAppID()
+
 	d.NoLogID = "ㅇㅇ"
 	d.NoLogPW = "1111"
 	// fmt.Println(d.FCM)

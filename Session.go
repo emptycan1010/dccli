@@ -2,7 +2,6 @@ package dccli
 
 import (
 	"bytes"
-	"compress/gzip"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
@@ -186,20 +185,26 @@ func New() *Session {
 }
 
 func (s *Session) FetchFCMToken() {
+	// rr := url.Values{}
+	// rr.Add("fid", "")
+	// rr.Add("refreshToken", "")
+	// rr.Add("appId", "1:477369754343:android:1f4e2da7c458e2a7")
+	// rr.Add("authVersion", "FIS_v2")
+	// rr.Add("sdkVersion", "a:17.0.2")
+	// // I must encode rr into Gzip
+
 	r, e := http.NewRequest("POST", "https://firebaseinstallations.googleapis.com/v1/projects/dcinside-b3f40/installations", nil)
 	if e != nil {
 		panic(e)
 	}
 	r.Header.Set("accept", "application/json")
-	r.Header.Set("accept-encoding", "gzip")
-	r.Header.Set("cache-control", "no-cache")
-	r.Header.Set("connection", "Keep-Alive")
-	r.Header.Set("content-encoding", "gzip")
-	// r.Header.Set("content-type", "application/json")
+	r.Header.Set("content-type", "application/json")
+	//r.Header.Set("content-encoding", "gzip")
+	// r.Header.Set("accept-encoding", "gzip")
 	r.Header.Set("host", "firebaseinstallations.googleapis.com")
 	r.Header.Set("user-agent", "Dalvik/2.1.0 (Linux; U; Android 13; Pixel 5 Build/TP1A.221105.002)")
-	r.Header.Set("x-android-cert", "43BD70DFC365EC1749F0424D28174DA44EE7659D")
-	r.Header.Set("x-android-package", "com.dcinside.app.android")
+	r.Header.Set("x-android-cert", "E6DA04787492CDBD34C77F31B890A3FAA3682D44")
+	r.Header.Set("x-android-package", "com.dcinside.app")
 	r.Header.Set("x-firebase-client", "H4sIAAAAAAAAAKtWykhNLCpJSk0sKVayio7VUSpLLSrOzM9TslIyUqoFAFyivEQfAAAA")
 	r.Header.Set("x-goog-api-key", "AIzaSyDcbVof_4Bi2GwJ1H8NjSwSTaMPPZeCE38")
 	b := bytes.NewBuffer(
@@ -212,16 +217,13 @@ func (s *Session) FetchFCMToken() {
 		),
 	)
 	r.Body = io.NopCloser(b)
+
 	client := &http.Client{}
 	res, err := client.Do(r)
 	if err != nil {
 		panic(err)
 	}
-	gReader, err := gzip.NewReader(res.Body)
-	if err != nil {
-		panic(err)
-	}
-	bod, err := io.ReadAll(gReader)
+	bod, err := io.ReadAll(res.Body)
 	if err != nil {
 		panic(err)
 	}
@@ -232,12 +234,14 @@ func (s *Session) FetchFCMToken() {
 		panic(e)
 	}
 	s.FCM = accountFCM
+	// fmt.Println(s.FCM)
 	// 이제 토큰가져오면됨 ㅋㅋ
 
 	rr := url.Values{}
 	rr.Add("X-subtype", "477369754343")
 	rr.Add("sender", "477369754343")
 	rr.Add("X-appid", gjson.Get(string(bod), "fid").String())
+	fmt.Println(gjson.Get(string(bod), "fid").String())
 	rr.Add("X-Goog-Firebase-Installations-Auth", gjson.Get(string(bod), "authToken.token").String())
 	rr.Add("app", "com.dcinside.app.android")
 	rr.Add("device", "3966377448498170683")
@@ -258,6 +262,7 @@ func (s *Session) FetchFCMToken() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(string(bod))
 	// fmt.Println(string(bod))
 	s.FCM.Token = string(bod)[6:]
 }

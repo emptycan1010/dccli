@@ -242,27 +242,29 @@ func (s *Session) FetchFCMToken() {
 	rr := url.Values{}
 	rr.Add("X-subtype", "477369754343")
 	rr.Add("sender", "477369754343")
-	rr.Add("X-appid", gjson.Get(string(bod), "fid").String())
 	rr.Add("X-app_ver", "4.7.5")
-	rr.Add("app_ver", "4.7.5")
-	rr.Add("gcm_ver", "221215022")
+	rr.Add("X-appid", gjson.Get(string(bod), "fid").String())
 	rr.Add("X-scope", "*")
+	rr.Add("X-Goog-Firebase-Installations-Auth", gjson.Get(string(bod), "authToken.token").String())
 	rr.Add("X-gmp_app_id", "1:477369754343:android:1f4e2da7c458e2a7")
 	rr.Add("X-firebase-app-name-hash", "R1dAH9Ui7M-ynoznwBdw01tLxhI")
 	rr.Add("X-app_ver_name", "100028")
 	rr.Add("app", "com.dcinside.app")
-	rr.Add("X-Goog-Firebase-Installations-Auth", gjson.Get(string(bod), "authToken.token").String())
-	rr.Add("app", "com.dcinside.app")
-	rr.Add("cert", "E6DA04787492CDBD34C77F31B890A3FAA3682D44")
 	rr.Add("device", "3966377448498170683")
+	rr.Add("app_ver", "4.7.5")
+	rr.Add("gcm_ver", "221215022")
+	rr.Add("cert", "E6DA04787492CDBD34C77F31B890A3FAA3682D44")
 
 	r, e = http.NewRequest("POST", "https://android.apis.google.com/c2dm/register3", strings.NewReader(rr.Encode()))
 	if e != nil {
 		panic(e)
 	}
 	r.Header.Set("authorization", "AidLogin 3966377448498170683:2982263657081238075")
-	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	fmt.Sprintf("AidLogin %s:%s", "", "")
+
 	r.Header.Set("host", "android.apis.google.com")
+	r.Header.Set("app", "com.dcinside.app")
 	client = &http.Client{}
 	res, err = client.Do(r)
 	if err != nil {

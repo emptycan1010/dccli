@@ -28,15 +28,13 @@ func main() {
 	// memo := []dccli.MemoBlock{}
 	// memo = append(memo, dccli.MemoBlock{Content: "<div>test</div>"})
 	// fmt.Println(d.RequestPost("tsmanga", "가나마", memo))
-	d.FetchFCMToken()
 	d.GetAppID()
-
+	d.FetchFCMToken()
 	d.NoLogID = "ㅇㅇ"
 	d.NoLogPW = "1111"
 	// fmt.Println(d.FCM)
 	// fmt.Println(d.Appid)
 	// fmt.Println(d.FCM.Token)
-	// fmt.Println(d.Appid)
 	fmt.Println(d.AddComment("tsmanga", 1, "ㅇㅇ", "ㅇㅇ", "1111"))
 
 	// d.RequestPost("tsmanga", "asdf", []dccli.MemoBlock{{Content: "<div>xtx</div>"}})

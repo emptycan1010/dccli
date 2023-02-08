@@ -2,6 +2,7 @@ package dccli
 
 import (
 	"bytes"
+	"compress/gzip"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
@@ -94,20 +95,14 @@ func (s *Session) GetAppID() error {
 		log.Fatal(err)
 	}
 	h := sha256.New()
-	h.Write([]byte(fmt.Sprintf("dcArdchk_%s", Appc[0].Date))) // value token calculated
-	// res, err = http.PostForm(
-	// 	"https://msign.dcinside.com/auth/mobile_app_verification",
-	// 	url.Values{
-	// 		"value_token":  {fmt.Sprintf("%x", h.Sum(nil))},
-	// 		"signature":    {"ReOo4u96nnv8Njd7707KpYiIVYQ3FlcKHDJE046Pg6s="},
-	// 		"client_token": {s.FCM.Token},
-	// 	},
-	// )
-
+	h.Write([]byte(fmt.Sprintf("dcArdchk_%s", Appc[0].Date)))
 	req, err := http.NewRequest(
 		"POST",
 		"https://msign.dcinside.com/auth/mobile_app_verification",
 		strings.NewReader(url.Values{
+			"vName":        {"4.7.5"},
+			"vCode":        {"100028"},
+			"pkg":          {"com.dcinside.app"},
 			"value_token":  {fmt.Sprintf("%x", h.Sum(nil))},
 			"signature":    {"ReOo4u96nnv8Njd7707KpYiIVYQ3FlcKHDJE046Pg6s="},
 			"client_token": {s.FCM.Token},
@@ -116,14 +111,21 @@ func (s *Session) GetAppID() error {
 	if err != nil {
 		return errors.New("Error Making Request")
 	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	// req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("User-Agent", "dcinside.app")
+	req.Header.Set("accept-encoding", "gzip")
+	req.Header.Set("referer", "http://www.dcinside.com")
+	req.Header.Set("user-agent", "dcinside.app")
 	client := &http.Client{}
 	res, err = client.Do(req)
 	if err != nil {
 		return errors.New("Error Posting Request")
 	}
-	bod, _ = io.ReadAll(res.Body)
+	gre, err := gzip.NewReader(res.Body)
+	if err != nil {
+		return errors.New("Error gzip")
+	}
+	bod, _ = io.ReadAll(gre)
 	fmt.Println(string(bod))
 	s.Appid = gjson.Get(string(bod), "app_id").String()
 	if gjson.Get(string(bod), "result").Bool() == false {
@@ -241,7 +243,7 @@ func (s *Session) FetchFCMToken() {
 	rr.Add("X-subtype", "477369754343")
 	rr.Add("sender", "477369754343")
 	rr.Add("X-appid", gjson.Get(string(bod), "fid").String())
-	fmt.Println(gjson.Get(string(bod), "fid").String())
+	// fmt.Println(gjson.Get(string(bod), "fid").String())
 	rr.Add("X-Goog-Firebase-Installations-Auth", gjson.Get(string(bod), "authToken.token").String())
 	rr.Add("app", "com.dcinside.app.android")
 	rr.Add("device", "3966377448498170683")
@@ -262,7 +264,7 @@ func (s *Session) FetchFCMToken() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(bod))
+	// fmt.Println(string(bod))
 	// fmt.Println(string(bod))
 	s.FCM.Token = string(bod)[6:]
 }

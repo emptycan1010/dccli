@@ -2,6 +2,8 @@
 
 개발중인 라이브러리에요.
 
+[KotlinInside](https://github.com/organization/KotlinInside)를 참고했어요.
+
 # WIP
 객체지향
 

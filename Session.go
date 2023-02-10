@@ -255,6 +255,32 @@ func (s *Session) FetchFCMToken() {
 	rr.Add("gcm_ver", "221215022")
 	rr.Add("cert", "E6DA04787492CDBD34C77F31B890A3FAA3682D44")
 
+	//var andid int64 = 0
+	//var fingerprint = "google/razor/flo:7.1.1/NMF26Q/1602158:user/release-keys"
+	//var hdw = "flo"
+	//radio := "FLO-04.04"
+	//clid := "android-google"
+	//sdkver := int32(25)
+	//loc := "ko"
+	//tz := "KST"
+	//asdf := checkin.CheckinRequest_Checkin_Build{
+	//	Fingerprint: &fingerprint,
+	//	Hardware:    &hdw,
+	//	Radio:       &radio,
+	//	ClientId:    &clid,
+	//	SdkVersion:  &sdkver,
+	//}
+	//
+	//checkinReq := checkin.CheckinRequest{
+	//	TimeZone:         &tz,
+	//	AndroidId:        &andid,
+	//	Locale:           &loc,
+	//	Version:          nil,
+	//	OtaCert:          nil,
+	//	MacAddress:       "02:00:00:00:00:00",
+	//	Fragment:         nil, // 0
+	//	UserSerialNumber: nil, // 0
+	//}
 	r, e = http.NewRequest("POST", "https://android.apis.google.com/c2dm/register3", strings.NewReader(rr.Encode()))
 	if e != nil {
 		panic(e)

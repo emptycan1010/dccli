@@ -8,10 +8,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/emptycan1010/dcgo/checkin"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/tidwall/gjson"
@@ -239,6 +241,52 @@ func (s *Session) FetchFCMToken() {
 	// fmt.Println(s.FCM)
 	// 이제 토큰가져오면됨 ㅋㅋ
 
+	var andid int64 = 0
+	var fingerprint = "google/razor/flo:7.1.1/NMF26Q/1602158:user/release-keys"
+	var hdw = "flo"
+	radio := "FLO-04.04"
+	clid := "android-google"
+	sdkver := int32(25)
+	loc := "ko"
+	tz := "KST"
+	var lcms int64 = 0
+	var zero int32 = 0
+	var three int32 = 0
+	checkinReq := checkin.CheckinRequest{
+		TimeZone:         &tz,
+		AndroidId:        &andid,
+		Locale:           &loc,
+		Version:          &three,
+		OtaCert:          []string{"--no-output--"},
+		MacAddress:       []string{"02", "00", "00", "00", "00", "00"},
+		Fragment:         &zero,
+		UserSerialNumber: &zero, // 0
+
+		//CheckinRequest_Checkin
+		Checkin: &checkin.CheckinRequest_Checkin{
+			Build: &checkin.CheckinRequest_Checkin_Build{
+				Fingerprint: &fingerprint,
+				Hardware:    &hdw,
+				Radio:       &radio,
+				ClientId:    &clid,
+				SdkVersion:  &sdkver,
+			},
+			LastCheckinMs: &lcms,
+		},
+	}
+
+	//checkinReq.String()
+
+	r, e = http.NewRequest("POST", "https://android.clients.google.com/checkin", bytes.NewBufferString(checkinReq.String()))
+	r.Header.Set("Content-Type", "application/x-protobuf")
+	r.Header.Set("User-Agent", "Android-Checkin/3.0")
+
+	res, err = client.Do(r)
+	if err != nil {
+		panic(err)
+	}
+	bod, err = io.ReadAll(res.Body)
+	fmt.Println(string(bod))
 	rr := url.Values{}
 	rr.Add("X-subtype", "477369754343")
 	rr.Add("sender", "477369754343")
@@ -250,37 +298,10 @@ func (s *Session) FetchFCMToken() {
 	rr.Add("X-firebase-app-name-hash", "R1dAH9Ui7M-ynoznwBdw01tLxhI")
 	rr.Add("X-app_ver_name", "100028")
 	rr.Add("app", "com.dcinside.app")
-	rr.Add("device", "3966377448498170683")
+	rr.Add("device", strconv.FormatInt(andid, 10))
 	rr.Add("app_ver", "4.7.5")
 	rr.Add("gcm_ver", "221215022")
 	rr.Add("cert", "E6DA04787492CDBD34C77F31B890A3FAA3682D44")
-
-	//var andid int64 = 0
-	//var fingerprint = "google/razor/flo:7.1.1/NMF26Q/1602158:user/release-keys"
-	//var hdw = "flo"
-	//radio := "FLO-04.04"
-	//clid := "android-google"
-	//sdkver := int32(25)
-	//loc := "ko"
-	//tz := "KST"
-	//asdf := checkin.CheckinRequest_Checkin_Build{
-	//	Fingerprint: &fingerprint,
-	//	Hardware:    &hdw,
-	//	Radio:       &radio,
-	//	ClientId:    &clid,
-	//	SdkVersion:  &sdkver,
-	//}
-	//
-	//checkinReq := checkin.CheckinRequest{
-	//	TimeZone:         &tz,
-	//	AndroidId:        &andid,
-	//	Locale:           &loc,
-	//	Version:          nil,
-	//	OtaCert:          nil,
-	//	MacAddress:       "02:00:00:00:00:00",
-	//	Fragment:         nil, // 0
-	//	UserSerialNumber: nil, // 0
-	//}
 	r, e = http.NewRequest("POST", "https://android.apis.google.com/c2dm/register3", strings.NewReader(rr.Encode()))
 	if e != nil {
 		panic(e)

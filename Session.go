@@ -308,7 +308,7 @@ func (s *Session) FetchFCMToken() {
 	}
 	r.Header.Set("authorization", "AidLogin 3966377448498170683:2982263657081238075")
 
-	fmt.Sprintf("AidLogin %s:%s", "", "")
+	//fmt.Sprintf("AidLogin %s:%s", "", "")
 
 	r.Header.Set("host", "android.apis.google.com")
 	r.Header.Set("app", "com.dcinside.app")

@@ -91,7 +91,7 @@ func (s *Session) DelPost(gallid string, gno int, pw string) (bool, error) {
 	rr.Add("write_pw", pw)
 	rr.Add("app_id", s.Appid)
 	rr.Add("mode", "board_del")
-	rr.Add("client_token", s.FCM.Token)
+	//rr.Add("client_token", s.FCM.Token)
 	req, err := http.NewRequest(
 		"POST",
 		"https://app.dcinside.com/api/gall_del.php",
@@ -122,7 +122,7 @@ func (s *Session) RequestPost(gallid string, subject string, memoblock []MemoBlo
 	rr.Add("id", gallid)
 	rr.Add("app_id", s.Appid)
 	rr.Add("mode", "write")
-	rr.Add("client_token", s.FCM.Token)
+	//rr.Add("client_token", s.FCM.Token)
 	rr.Add("subject", url.QueryEscape(subject)) // Subject, must be encoded into URL
 	rr.Add("name", url.QueryEscape(s.NoLogID))  // Name, must be encoded into URL
 	rr.Add("password", s.NoLogPW)

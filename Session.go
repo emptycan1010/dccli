@@ -1,19 +1,16 @@
 package dccli
 
 import (
-	"bytes"
 	"compress/gzip"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/emptycan1010/dcgo/checkin"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/tidwall/gjson"
@@ -28,7 +25,7 @@ type Session struct {
 	Apptoken   string
 	NowGallID  string
 	NowPostNo  int
-	FCM        AccountFCM
+	//FCM        AccountFCM
 }
 
 type AppCheckstruct struct {
@@ -102,12 +99,12 @@ func (s *Session) GetAppID() error {
 		"POST",
 		"https://msign.dcinside.com/auth/mobile_app_verification",
 		strings.NewReader(url.Values{
-			"vName":        {"4.7.5"},
-			"vCode":        {"100028"},
-			"pkg":          {"com.dcinside.app"},
-			"value_token":  {fmt.Sprintf("%x", h.Sum(nil))},
-			"signature":    {"ReOo4u96nnv8Njd7707KpYiIVYQ3FlcKHDJE046Pg6s="},
-			"client_token": {s.FCM.Token},
+			"vName":       {"4.7.5"},
+			"vCode":       {"100028"},
+			"pkg":         {"com.dcinside.app"},
+			"value_token": {fmt.Sprintf("%x", h.Sum(nil))},
+			"signature":   {"ReOo4u96nnv8Njd7707KpYiIVYQ3FlcKHDJE046Pg6s="},
+			//"client_token": {s.FCM.Token},
 		}.Encode()),
 	)
 	if err != nil {
@@ -143,7 +140,7 @@ func (s *Session) Login(id string, pw string) error {
 	rr := url.Values{}
 	rr.Add("user_id", id)
 	rr.Add("user_pw", pw)
-	rr.Add("client_token", s.FCM.Token)
+	//rr.Add("client_token", s.FCM.Token)
 	rr.Add("mode", "login_normal")
 
 	req, err := http.NewRequest(
@@ -188,151 +185,151 @@ func New() *Session {
 	return p
 }
 
-func (s *Session) FetchFCMToken() {
-	// rr := url.Values{}
-	// rr.Add("fid", "")
-	// rr.Add("refreshToken", "")
-	// rr.Add("appId", "1:477369754343:android:1f4e2da7c458e2a7")
-	// rr.Add("authVersion", "FIS_v2")
-	// rr.Add("sdkVersion", "a:17.0.2")
-	// // I must encode rr into Gzip
+//func (s *Session) FetchFCMToken() {
+//	// rr := url.Values{}
+//	// rr.Add("fid", "")
+//	// rr.Add("refreshToken", "")
+//	// rr.Add("appId", "1:477369754343:android:1f4e2da7c458e2a7")
+//	// rr.Add("authVersion", "FIS_v2")
+//	// rr.Add("sdkVersion", "a:17.0.2")
+//	// // I must encode rr into Gzip
+//
+//	r, e := http.NewRequest("POST", "https://firebaseinstallations.googleapis.com/v1/projects/dcinside-b3f40/installations", nil)
+//	if e != nil {
+//		panic(e)
+//	}
+//	r.Header.Set("accept", "application/json")
+//	r.Header.Set("content-type", "application/json")
+//	//r.Header.Set("content-encoding", "gzip")
+//	// r.Header.Set("accept-encoding", "gzip")
+//	r.Header.Set("host", "firebaseinstallations.googleapis.com")
+//	r.Header.Set("user-agent", "Dalvik/2.1.0 (Linux; U; Android 13; Pixel 5 Build/TP1A.221105.002)")
+//	r.Header.Set("x-android-cert", "E6DA04787492CDBD34C77F31B890A3FAA3682D44")
+//	r.Header.Set("x-android-package", "com.dcinside.app")
+//	r.Header.Set("x-firebase-client", "H4sIAAAAAAAAAKtWykhNLCpJSk0sKVayio7VUSpLLSrOzM9TslIyUqoFAFyivEQfAAAA")
+//	r.Header.Set("x-goog-api-key", "AIzaSyDcbVof_4Bi2GwJ1H8NjSwSTaMPPZeCE38")
+//	b := bytes.NewBuffer(
+//		[]byte(
+//			`{
+//		"fid": "",
+//		"appId": "1:477369754343:android:d2ffdd960120a207727842",
+//		"authVersion": "FIS_v2",
+//		"sdkVersion": "a:17.0.2"}`,
+//		),
+//	)
+//	r.Body = io.NopCloser(b)
+//
+//	client := &http.Client{}
+//	res, err := client.Do(r)
+//	if err != nil {
+//		panic(err)
+//	}
+//	bod, err := io.ReadAll(res.Body)
+//	if err != nil {
+//		panic(err)
+//	}
+//	// fmt.Println(string(bod))
+//	var accountFCM AccountFCM
+//	e = json.Unmarshal(bod, &accountFCM)
+//	if e != nil {
+//		panic(e)
+//	}
+//	s.FCM = accountFCM
+//	// fmt.Println(s.FCM)
+//	// 이제 토큰가져오면됨 ㅋㅋ
+//
+//	//var andid int64 = 0
+//	//var fingerprint = "google/razor/flo:7.1.1/NMF26Q/1602158:user/release-keys"
+//	//var hdw = "flo"
+//	//radio := "FLO-04.04"
+//	//clid := "android-google"
+//	//sdkver := int32(25)
+//	//loc := "ko"
+//	//tz := "KST"
+//	//var lcms int64 = 0
+//	//var zero int32 = 0
+//	//var three int32 = 0
+//	//checkinReq := checkin.CheckinRequest{
+//	//	TimeZone:         &tz,
+//	//	AndroidId:        &andid,
+//	//	Locale:           &loc,
+//	//	Version:          &three,
+//	//	OtaCert:          []string{"--no-output--"},
+//	//	MacAddress:       []string{"02", "00", "00", "00", "00", "00"},
+//	//	Fragment:         &zero,
+//	//	UserSerialNumber: &zero, // 0
+//	//
+//	//	//CheckinRequest_Checkin
+//	//	Checkin: &checkin.CheckinRequest_Checkin{
+//	//		Build: &checkin.CheckinRequest_Checkin_Build{
+//	//			Fingerprint: &fingerprint,
+//	//			Hardware:    &hdw,
+//	//			Radio:       &radio,
+//	//			ClientId:    &clid,
+//	//			SdkVersion:  &sdkver,
+//	//		},
+//	//		LastCheckinMs: &lcms,
+//	//	},
+//	//}
+//	//
+//	////checkinReq.String()
+//	//
+//	//r, e = http.NewRequest("POST", "https://android.clients.google.com/checkin", bytes.NewBufferString(checkinReq.String()))
+//	//r.Header.Set("Content-Type", "application/x-protobuf")
+//	//r.Header.Set("User-Agent", "Android-Checkin/3.0")
+//	//
+//	//res, err = client.Do(r)
+//	//if err != nil {
+//	//	panic(err)
+//	//}
+//	//bod, err = io.ReadAll(res.Body)
+//	//fmt.Println(string(bod))
+//	//rr := url.Values{}
+//	//rr.Add("X-subtype", "477369754343")
+//	//rr.Add("sender", "477369754343")
+//	//rr.Add("X-app_ver", "4.7.5")
+//	//rr.Add("X-appid", gjson.Get(string(bod), "fid").String())
+//	//rr.Add("X-scope", "*")
+//	//rr.Add("X-Goog-Firebase-Installations-Auth", gjson.Get(string(bod), "authToken.token").String())
+//	//rr.Add("X-gmp_app_id", "1:477369754343:android:1f4e2da7c458e2a7")
+//	//rr.Add("X-firebase-app-name-hash", "R1dAH9Ui7M-ynoznwBdw01tLxhI")
+//	//rr.Add("X-app_ver_name", "100028")
+//	//rr.Add("app", "com.dcinside.app")
+//	//rr.Add("device", strconv.FormatInt(andid, 10))
+//	//rr.Add("app_ver", "4.7.5")
+//	//rr.Add("gcm_ver", "221215022")
+//	//rr.Add("cert", "E6DA04787492CDBD34C77F31B890A3FAA3682D44")
+//	//r, e = http.NewRequest("POST", "https://android.apis.google.com/c2dm/register3", strings.NewReader(rr.Encode()))
+//	//if e != nil {
+//	//	panic(e)
+//	//}
+//	//r.Header.Set("authorization", "AidLogin 3966377448498170683:2982263657081238075")
+//	//
+//	////fmt.Sprintf("AidLogin %s:%s", "", "")
+//	//
+//	//r.Header.Set("host", "android.apis.google.com")
+//	//r.Header.Set("app", "com.dcinside.app")
+//	//client = &http.Client{}
+//	//res, err = client.Do(r)
+//	//if err != nil {
+//	//	panic(err)
+//	//}
+//	//bod, err = io.ReadAll(res.Body)
+//	//if err != nil {
+//	//	panic(err)
+//	//}
+//	//// fmt.Println(string(bod))
+//	//// fmt.Println(string(bod))
+//	//s.FCM.Token = string(bod)[6:]
+//}
 
-	r, e := http.NewRequest("POST", "https://firebaseinstallations.googleapis.com/v1/projects/dcinside-b3f40/installations", nil)
-	if e != nil {
-		panic(e)
-	}
-	r.Header.Set("accept", "application/json")
-	r.Header.Set("content-type", "application/json")
-	//r.Header.Set("content-encoding", "gzip")
-	// r.Header.Set("accept-encoding", "gzip")
-	r.Header.Set("host", "firebaseinstallations.googleapis.com")
-	r.Header.Set("user-agent", "Dalvik/2.1.0 (Linux; U; Android 13; Pixel 5 Build/TP1A.221105.002)")
-	r.Header.Set("x-android-cert", "E6DA04787492CDBD34C77F31B890A3FAA3682D44")
-	r.Header.Set("x-android-package", "com.dcinside.app")
-	r.Header.Set("x-firebase-client", "H4sIAAAAAAAAAKtWykhNLCpJSk0sKVayio7VUSpLLSrOzM9TslIyUqoFAFyivEQfAAAA")
-	r.Header.Set("x-goog-api-key", "AIzaSyDcbVof_4Bi2GwJ1H8NjSwSTaMPPZeCE38")
-	b := bytes.NewBuffer(
-		[]byte(
-			`{
-		"fid": "",
-		"appId": "1:477369754343:android:d2ffdd960120a207727842",
-		"authVersion": "FIS_v2",
-		"sdkVersion": "a:17.0.2"}`,
-		),
-	)
-	r.Body = io.NopCloser(b)
-
-	client := &http.Client{}
-	res, err := client.Do(r)
-	if err != nil {
-		panic(err)
-	}
-	bod, err := io.ReadAll(res.Body)
-	if err != nil {
-		panic(err)
-	}
-	// fmt.Println(string(bod))
-	var accountFCM AccountFCM
-	e = json.Unmarshal(bod, &accountFCM)
-	if e != nil {
-		panic(e)
-	}
-	s.FCM = accountFCM
-	// fmt.Println(s.FCM)
-	// 이제 토큰가져오면됨 ㅋㅋ
-
-	var andid int64 = 0
-	var fingerprint = "google/razor/flo:7.1.1/NMF26Q/1602158:user/release-keys"
-	var hdw = "flo"
-	radio := "FLO-04.04"
-	clid := "android-google"
-	sdkver := int32(25)
-	loc := "ko"
-	tz := "KST"
-	var lcms int64 = 0
-	var zero int32 = 0
-	var three int32 = 0
-	checkinReq := checkin.CheckinRequest{
-		TimeZone:         &tz,
-		AndroidId:        &andid,
-		Locale:           &loc,
-		Version:          &three,
-		OtaCert:          []string{"--no-output--"},
-		MacAddress:       []string{"02", "00", "00", "00", "00", "00"},
-		Fragment:         &zero,
-		UserSerialNumber: &zero, // 0
-
-		//CheckinRequest_Checkin
-		Checkin: &checkin.CheckinRequest_Checkin{
-			Build: &checkin.CheckinRequest_Checkin_Build{
-				Fingerprint: &fingerprint,
-				Hardware:    &hdw,
-				Radio:       &radio,
-				ClientId:    &clid,
-				SdkVersion:  &sdkver,
-			},
-			LastCheckinMs: &lcms,
-		},
-	}
-
-	//checkinReq.String()
-
-	r, e = http.NewRequest("POST", "https://android.clients.google.com/checkin", bytes.NewBufferString(checkinReq.String()))
-	r.Header.Set("Content-Type", "application/x-protobuf")
-	r.Header.Set("User-Agent", "Android-Checkin/3.0")
-
-	res, err = client.Do(r)
-	if err != nil {
-		panic(err)
-	}
-	bod, err = io.ReadAll(res.Body)
-	fmt.Println(string(bod))
-	rr := url.Values{}
-	rr.Add("X-subtype", "477369754343")
-	rr.Add("sender", "477369754343")
-	rr.Add("X-app_ver", "4.7.5")
-	rr.Add("X-appid", gjson.Get(string(bod), "fid").String())
-	rr.Add("X-scope", "*")
-	rr.Add("X-Goog-Firebase-Installations-Auth", gjson.Get(string(bod), "authToken.token").String())
-	rr.Add("X-gmp_app_id", "1:477369754343:android:1f4e2da7c458e2a7")
-	rr.Add("X-firebase-app-name-hash", "R1dAH9Ui7M-ynoznwBdw01tLxhI")
-	rr.Add("X-app_ver_name", "100028")
-	rr.Add("app", "com.dcinside.app")
-	rr.Add("device", strconv.FormatInt(andid, 10))
-	rr.Add("app_ver", "4.7.5")
-	rr.Add("gcm_ver", "221215022")
-	rr.Add("cert", "E6DA04787492CDBD34C77F31B890A3FAA3682D44")
-	r, e = http.NewRequest("POST", "https://android.apis.google.com/c2dm/register3", strings.NewReader(rr.Encode()))
-	if e != nil {
-		panic(e)
-	}
-	r.Header.Set("authorization", "AidLogin 3966377448498170683:2982263657081238075")
-
-	//fmt.Sprintf("AidLogin %s:%s", "", "")
-
-	r.Header.Set("host", "android.apis.google.com")
-	r.Header.Set("app", "com.dcinside.app")
-	client = &http.Client{}
-	res, err = client.Do(r)
-	if err != nil {
-		panic(err)
-	}
-	bod, err = io.ReadAll(res.Body)
-	if err != nil {
-		panic(err)
-	}
-	// fmt.Println(string(bod))
-	// fmt.Println(string(bod))
-	s.FCM.Token = string(bod)[6:]
-}
-
-type AccountFCM struct {
-	Name         string `json:"name"`
-	Fid          string `json:"fid"`
-	RefreshToken string `json:"refreshToken"`
-	AuthToken    struct {
-		Token     string `json:"token"`
-		ExpiresIn string `json:"expiresIn"`
-	} `json:"authToken"`
-	Token string
-}
+//type AccountFCM struct {
+//	Name         string `json:"name"`
+//	Fid          string `json:"fid"`
+//	RefreshToken string `json:"refreshToken"`
+//	AuthToken    struct {
+//		Token     string `json:"token"`
+//		ExpiresIn string `json:"expiresIn"`
+//	} `json:"authToken"`
+//	Token string
+//}

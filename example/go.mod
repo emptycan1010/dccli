@@ -8,7 +8,8 @@ require (
 )
 
 require (
-	github.com/emptycan1010/dcgo v0.0.0-20230207075916-3948e5e9031c // indirect
+	github.com/emptycan1010/dcgo v0.0.0-20230215134154-c1703aece16c // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 )

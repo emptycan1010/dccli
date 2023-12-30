@@ -4,8 +4,9 @@
 
 [KotlinInside](https://github.com/organization/KotlinInside)를 참고했어요.
 
-# WIP
-객체지향
+## 중대 이슈
+
+안드로이드 기기 고유값을 생성해내야함. 
 
 ### 추가할 기능
 - [x] 글 목록 가져오기
